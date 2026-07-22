@@ -1,0 +1,1450 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>HairVision — Vista previa</title>
+<style>
+  /* No external fonts/scripts of any kind — this file works fully offline,
+     double-click and open, no internet connection required. */
+  :root {
+    --color-bg: #f6f2ea;
+    --color-surface: #ffffff;
+    --color-surface-raised: #ffffff;
+    --color-surface-sunken: #ece5d9;
+    --color-ink: #211d17;
+    --color-ink-muted: #6f675c;
+    --color-ink-faint: #a89f90;
+    --color-line: rgba(33, 29, 23, 0.10);
+    --color-line-soft: rgba(33, 29, 23, 0.08);
+    --color-accent: #92583a;
+    --color-accent-strong: #7a4529;
+    --color-selected: #a83f2e;
+    --color-selected-soft: rgba(168, 63, 46, 0.08);
+    --color-reject: #6b2c20;
+    --color-reject-soft: rgba(107, 44, 32, 0.08);
+    --color-success: #4c6b46;
+    --font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+    --space-5: 1.5rem; --space-6: 2rem; --space-7: 3rem; --space-8: 4rem;
+    --radius-sm: 10px; --radius-md: 16px; --radius-lg: 24px; --radius-full: 999px;
+    --tracking-wide: 0.04em; --tracking-wider: 0.1em; --tracking-widest: 0.28em;
+    --shadow-xs: 0 1px 2px rgba(33,29,23,0.04);
+    --shadow-sm: 0 2px 8px rgba(33,29,23,0.06), 0 1px 2px rgba(33,29,23,0.05);
+    --shadow-md: 0 12px 28px rgba(33,29,23,0.10), 0 2px 6px rgba(33,29,23,0.05);
+    --shadow-lg: 0 24px 56px rgba(33,29,23,0.18);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --nav-zone-size: 96px;
+  }
+  * { box-sizing: border-box; }
+  html, body, #root { height: 100%; margin: 0; }
+  body { font-family: var(--font-family); background: var(--color-bg); color: var(--color-ink); overflow: hidden; user-select: none; -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; cursor: pointer; }
+  input { font-family: inherit; }
+
+  .hv-shell { width: 100%; height: 100%; min-width: 900px; min-height: 600px; position: relative; background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(146,88,58,0.06), transparent 60%),
+      var(--color-bg); }
+  .hv-screen { height: 100%; width: 100%; padding: var(--space-6) var(--space-7); display: flex; flex-direction: column; box-sizing: border-box; animation: hv-screen-in .38s var(--ease); }
+  @keyframes hv-screen-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .hv-header { display:flex; align-items:center; justify-content:space-between; margin-bottom: var(--space-7); }
+  .hv-title { font-size: 1.5rem; letter-spacing: var(--tracking-wide); text-transform: none; font-weight: 600; margin:0; color: var(--color-ink); }
+
+  .hv-cart { display:inline-flex; align-items:center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border:1px solid var(--color-line); border-radius: var(--radius-full); background: var(--color-surface); box-shadow: var(--shadow-xs); font-variant-numeric: tabular-nums; }
+
+  .hv-btn { display:inline-flex; align-items:center; justify-content:center; gap: var(--space-3); min-width:220px; padding: var(--space-4) var(--space-6); border-radius: var(--radius-full); font-size:1rem; font-weight:500; letter-spacing: var(--tracking-wide); text-transform: none; background: var(--color-surface); border:1px solid var(--color-line); color: var(--color-ink); box-shadow: var(--shadow-sm); transition: transform .16s var(--ease), box-shadow .16s var(--ease), background .16s var(--ease); }
+  .hv-btn:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
+  .hv-btn:active { transform: scale(.97) translateY(0); box-shadow: var(--shadow-xs); }
+  .hv-btn.outline { border-color: var(--color-line); }
+  .hv-btn.primary { background: var(--color-ink); color: var(--color-surface-raised); border-color: var(--color-ink); }
+  .hv-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; box-shadow: var(--shadow-xs); }
+  .hv-btn.ghost { border-color: transparent; background: transparent; box-shadow: none; }
+
+  .hv-card { position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap: var(--space-3); padding: var(--space-4); background: var(--color-surface); border:1px solid var(--color-line); border-radius: var(--radius-md); min-height:220px; box-shadow: var(--shadow-sm); transition: transform .18s var(--ease), box-shadow .18s var(--ease), border-color .18s var(--ease); width:100%; }
+  .hv-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .hv-card:active { transform: scale(.98); }
+  .hv-card.selected { border:1.5px solid var(--color-selected); background: var(--color-selected-soft); box-shadow: 0 0 0 4px var(--color-selected-soft), var(--shadow-sm); }
+  .hv-card.selected .hv-card-label { color: var(--color-selected); }
+  .hv-card-media { flex:1; width:100%; display:flex; align-items:center; justify-content:center; }
+  .hv-card-media svg { width: 84px; height: 100px; }
+  .hv-card-label { font-size:.8125rem; letter-spacing: var(--tracking-wide); text-transform:none; font-weight:500; text-align:center; }
+  /* Tarjetas Antes/Después con foto real: la imagen ocupa toda la
+     tarjeta, sin margen blanco alrededor; la etiqueta flota encima. */
+  .hv-card.hv-photo-card { padding:0; overflow:hidden; }
+  .hv-card.hv-photo-card .hv-card-media { flex:1; width:100%; margin:0; min-height:0; }
+  .hv-card.hv-photo-card .hv-card-media img { width:100%; height:100%; object-fit:cover; display:block; }
+  .hv-card.hv-photo-card .hv-card-label { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(28,26,23,.72); color:#fff; padding:.4rem 1rem; border-radius:999px; margin:0; }
+
+  .hv-grid { flex:1; display:grid; gap: var(--space-5); align-content:start; }
+  .hv-grid-3 { grid-template-columns: repeat(3,1fr); }
+  .hv-grid-4 { grid-template-columns: repeat(4,1fr); }
+  /* Tipos de Corte: 7 tarjetas, en dos filas fijas (4 arriba, 3 abajo).
+     Cada fila es un flex:1 dentro de una columna, así que las dos filas
+     se reparten EXACTAMENTE el alto disponible entre ellas (nunca se
+     desbordan ni se cortan), y cada tarjeta ocupa el 100% del alto de su
+     fila (nunca se superpone con la fila de al lado, sea cual sea el
+     tamaño de la foto). La fila de 3 queda centrada. */
+  .hv-grid-rows { flex:1; display:flex; flex-direction:column; gap: var(--space-5); min-height:0; }
+  .hv-grid-row { flex:1; display:flex; gap: var(--space-5); justify-content:center; min-height:0; }
+  .hv-grid-row .hv-card.compact { flex: 0 0 calc(25% - 1.125rem); max-width: calc(25% - 1.125rem); height:100%; min-height:0; }
+  .hv-grid-row .hv-card.compact .hv-card-media { min-height:0; }
+
+  .hv-section { display:flex; flex-direction:column; gap: var(--space-4); padding: var(--space-5); border:1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface-raised); box-shadow: var(--shadow-xs); }
+  .hv-section-title { font-size:.75rem; letter-spacing: var(--tracking-wider); text-transform:uppercase; color: var(--color-ink-muted); text-decoration: none; font-weight: 600; margin:0; }
+
+  .hv-slider-block { display:flex; flex-direction:column; gap: var(--space-3); width:100%; }
+  .hv-slider-label { font-size:.75rem; letter-spacing: var(--tracking-wide); text-transform:uppercase; color: var(--color-ink-muted); margin:0; font-weight:600; }
+  .hv-slider-input { width:100%; appearance:none; -webkit-appearance:none; height:4px; border-radius: var(--radius-full); background: var(--color-surface-sunken); outline:none; }
+  .hv-slider-input::-webkit-slider-thumb { -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%; background: var(--color-surface); border:none; box-shadow: 0 0 0 1px var(--color-line), var(--shadow-sm); cursor:pointer; transition: transform .12s var(--ease); }
+  .hv-slider-input::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  .hv-slider-input::-moz-range-thumb { width:18px; height:18px; border-radius:50%; background: var(--color-surface); border:none; box-shadow: 0 0 0 1px var(--color-line), var(--shadow-sm); cursor:pointer; }
+  .hv-slider-ticks { display:flex; justify-content:space-between; gap: var(--space-2); }
+  .hv-slider-ticks-abs { position:relative; height: 1.1rem; margin-top: 2px; }
+  .hv-tick { font-size:.75rem; letter-spacing: var(--tracking-wide); color: var(--color-ink-faint); transition: color .12s; }
+  .hv-tick-abs { position:absolute; top:0; white-space:nowrap; }
+  .hv-tick.active { color: var(--color-accent); font-weight:600; }
+  .hv-slider-percent { font-size:2.25rem; font-weight:700; text-align:center; color: var(--color-ink); margin:0 0 .5rem; font-variant-numeric: tabular-nums; }
+
+  .hv-toggle-grid { display:grid; gap: var(--space-2); }
+  .hv-toggle { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); font-size:.8125rem; letter-spacing: var(--tracking-wide); text-transform:none; font-weight:500; border:1px solid var(--color-line); background: var(--color-surface); color: var(--color-ink); transition: all .16s var(--ease); }
+  .hv-toggle:hover { border-color: var(--color-accent); }
+  .hv-toggle.active { background: var(--color-ink); color: var(--color-surface-raised); border-color: var(--color-ink); }
+
+  .hv-corner { position:fixed; width: var(--nav-zone-size); height: var(--nav-zone-size); display:flex; background:transparent; border:none; z-index:40; padding:0; }
+  .hv-corner svg { width:18px; height:18px; margin: var(--space-5); color: var(--color-ink-faint); transition: color .15s, background .15s; padding:10px; border-radius:50%; box-sizing:content-box; }
+  .hv-corner:hover svg { color: var(--color-ink); background: var(--color-surface); box-shadow: var(--shadow-sm); }
+  .hv-corner.tl { top:0; left:0; align-items:flex-start; justify-content:flex-start; }
+  .hv-corner.bl { bottom:0; left:0; align-items:flex-end; justify-content:flex-start; }
+  .hv-corner.br { bottom:0; right:0; align-items:flex-end; justify-content:flex-end; }
+
+  .hv-overlay { position:fixed; inset:0; background: rgba(33,29,23,.45); backdrop-filter: blur(2px); display:flex; align-items:center; justify-content:center; z-index:90; animation: hv-fade-in .2s var(--ease); }
+  @keyframes hv-fade-in { from { opacity:0; } to { opacity:1; } }
+  .hv-sheet { width:min(480px,80vw); max-height:70vh; background: var(--color-surface-raised); border-radius: var(--radius-lg); padding: var(--space-6); display:flex; flex-direction:column; gap: var(--space-4); box-shadow: var(--shadow-lg); border:1px solid var(--color-line); }
+
+  .hv-record { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap: var(--space-4); border:1.5px dashed var(--color-line); border-radius: var(--radius-md); background: var(--color-surface); padding: var(--space-6); min-height:320px; width:100%; transition: border-color .15s, background .15s; }
+  .hv-record:hover { border-color: var(--color-accent); background: var(--color-surface-raised); }
+  .hv-icon-camera { display:inline-flex; width:38px; height:31px; }
+  .hv-icon-camera svg { width:100%; height:100%; }
+  .hv-input { padding: var(--space-4); border:1px solid var(--color-line); border-radius: var(--radius-sm); background: var(--color-surface); font-size:1rem; color: var(--color-ink); width:100%; transition: border-color .15s, box-shadow .15s; }
+  .hv-input:focus { outline:none; border-color: var(--color-accent); box-shadow: 0 0 0 3px var(--color-selected-soft); }
+
+  .hv-tile { position:relative; padding: var(--space-6); min-height:120px; display:flex; align-items:center; justify-content:center; border:1px solid var(--color-line); border-radius: var(--radius-md); background: var(--color-surface); font-size:1.0625rem; letter-spacing: var(--tracking-wide); font-weight:500; text-transform:none; width:100%; box-shadow: var(--shadow-sm); transition: transform .16s var(--ease), box-shadow .16s var(--ease); }
+  .hv-tile:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+  .hv-tile.active { border-color: var(--color-selected); background: var(--color-selected-soft); color: var(--color-selected); }
+  .hv-tile.wide { grid-column: 1/-1; }
+
+  .hv-row { display:flex; align-items:center; gap: var(--space-4); padding: var(--space-4) var(--space-5); border:1px solid var(--color-line); border-radius: var(--radius-sm); background: var(--color-surface-raised); width: 100%; text-align:left; box-shadow: var(--shadow-xs); transition: box-shadow .15s, transform .15s; }
+  .hv-row:hover { box-shadow: var(--shadow-sm); }
+  .hv-row-media svg { width:44px; height:56px; }
+  .hv-row-label { font-size:.75rem; letter-spacing: var(--tracking-wide); text-transform:uppercase; color: var(--color-ink-muted); display:block; font-weight:600; }
+  .hv-row-value { font-size:1.0625rem; }
+
+  .hv-whorl-canvas { position:relative; width: clamp(160px, 26vw, 260px); height: clamp(160px, 26vw, 260px); cursor: crosshair; touch-action: none; flex: none; }
+  .hv-whorl-marker { position:absolute; width:22px; height:22px; margin-left:-11px; margin-top:-11px; border-radius:50%; background: var(--color-selected-soft); border:2px solid var(--color-selected); box-shadow: var(--shadow-sm); }
+  .hv-whorl-marker::after { content:''; position:absolute; inset:6px; border-radius:50%; background: var(--color-selected); }
+
+  .hv-banner { position:fixed; top:0; left:0; right:0; background: var(--color-ink); color: var(--color-surface-raised); font-size: .75rem; text-align:center; padding: 7px; z-index: 200; letter-spacing: .02em; }
+  @keyframes hv-spin { to { transform: rotate(360deg); } }
+
+  .hv-grid-2 { grid-template-columns: repeat(2,1fr); }
+  .hv-ai-badge { position:absolute; top:10px; left:10px; font-size:.6875rem; letter-spacing:.02em; font-weight:600; color: var(--color-accent-strong); background: var(--color-selected-soft); padding: 3px 9px; border-radius: var(--radius-full); }
+  .hv-card.suggestion-card { min-height: 320px; padding: var(--space-6); gap: var(--space-3); }
+  .hv-card.suggestion-card .hv-card-media svg { width: 130px; height: 155px; }
+  .hv-card.suggestion-card .hv-card-label { font-size: 1.0625rem; }
+  .hv-card-desc { font-size:.8125rem; color: var(--color-ink-muted); text-align:center; line-height:1.45; }
+  .hv-reject-btn { display:inline-flex; align-items:center; gap: var(--space-3); padding: var(--space-3) var(--space-6); border-radius: var(--radius-full); background: var(--color-surface); border:1px solid var(--color-line); color: var(--color-ink-muted); font-size:.9375rem; font-weight:500; box-shadow: var(--shadow-xs); transition: all .16s var(--ease); align-self:center; }
+  .hv-reject-btn:hover { border-color: var(--color-reject); color: var(--color-reject); box-shadow: var(--shadow-sm); }
+  .hv-reject-btn.active { border-color: var(--color-reject); color: var(--color-reject); background: var(--color-reject-soft); }
+  .hv-reject-x { font-size:1.25rem; line-height:1; font-weight:700; color: var(--color-reject); }
+
+  .hv-cart-row { display:flex; align-items:center; gap: var(--space-3); padding: var(--space-3); border:1px solid var(--color-line); border-radius: var(--radius-sm); background: var(--color-surface); }
+  .hv-cart-row-media { width:40px; height:50px; flex:none; display:flex; align-items:center; justify-content:center; }
+  .hv-cart-row-media svg { width:100%; height:100%; }
+  .hv-cart-row-info { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .hv-cart-row-sub { font-size:.6875rem; letter-spacing:.04em; text-transform:uppercase; color: var(--color-ink-faint); font-weight:600; }
+  .hv-cart-row-label { font-size:.9375rem; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .hv-cart-row-remove { flex:none; width:28px; height:28px; border-radius:50%; border:1px solid var(--color-line); background: var(--color-surface); color: var(--color-reject); font-size:1.125rem; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .hv-cart-row-remove:hover { border-color: var(--color-reject); background: var(--color-reject-soft); }
+</style>
+</head>
+<body>
+<div class="hv-banner">Vista previa estática (sin frameworks, funciona sin internet) — el proyecto real vive en el repo Vite + React + TS.</div>
+<div id="root"></div>
+<script>
+'use strict';
+
+/* ---------- servidor de IA (Nano Banana) ---------- */
+// Cuando el servidor local (ver hairvision/server-README.md) esté
+// corriendo en el ordenador del salón, la app le habla a esta dirección.
+// Si algún día se sube a un hosting real, solo hay que cambiar esta URL.
+var HAIRVISION_SERVER_URL = 'https://hairvision-server.onrender.com';
+
+/* ---------- data ---------- */
+var HAIRCUT_TYPES = [
+  { id: 'corte-recto', label: 'Corte Recto', sil: 'recto' },
+  { id: 'corte-capas', label: 'Corte a Capas', sil: 'capas' },
+  { id: 'corte-bob', label: 'Corte Bob', sil: 'bob' },
+  { id: 'corte-pixie', label: 'Corte Pixie', sil: 'pixie' },
+  { id: 'corte-shag', label: 'Corte Shag', sil: 'shag' },
+  { id: 'corte-degradado', label: 'Corte Degradado', sil: 'degradado' },
+  { id: 'corte-asimetrico', label: 'Corte Asimétrico', sil: 'asimetrico' }
+];
+var BANGS_TYPES = [
+  { id: 'flequillo-recto', label: 'Flequillo Recto', sil: 'flequillo-recto' },
+  { id: 'flequillo-cortina', label: 'Flequillo Cortina', sil: 'flequillo-cortina' },
+  { id: 'flequillo-lateral', label: 'Flequillo Lateral', sil: 'flequillo-lateral' }
+];
+// En producción, todos estos campos vendrán generados por el servicio de
+// IA según el perfil de cabello de la clienta (hoy son datos de muestra).
+// haircutType/bangs/lengthValue/volumeReduction son los mismos campos que
+// se rellenarían a mano en Tipos de Corte/Ajustes de Corte — al aceptar
+// una sugerencia se rellenan solos, para que el resumen final se vea
+// exactamente igual que si se hubiera elegido todo manualmente.
+var SUGGESTION_OPTIONS = [
+  { id: 'x', label: 'Opción X', sil: 'sugerencia-x', desc: 'Corte a capas con volumen medio y flequillo cortina, pensado para dar movimiento.',
+    haircutType: 'corte-capas', bangs: 'flequillo-cortina', lengthValue: 55, volumeReduction: false },
+  { id: 'y', label: 'Opción Y', sil: 'sugerencia-y', desc: 'Bob con degradado suave y sin flequillo, para un acabado limpio y fácil de mantener.',
+    haircutType: 'corte-bob', bangs: null, lengthValue: 70, volumeReduction: true }
+];
+
+// La lista de pantallas depende de si se aceptó una sugerencia de IA: en
+// ese caso nos saltamos "Tipos de Cortes" y "Ajustes de Corte" y vamos
+// directas al resumen, que mostrará las características de esa sugerencia
+// en vez de una configuración manual.
+function getFlowSteps() {
+  var steps = ['home', 'clientProfile', 'suggestions'];
+  var acceptedAiSuggestion = state.selections.suggestion === 'x' || state.selections.suggestion === 'y';
+  if (!acceptedAiSuggestion) steps.push('haircutTypes', 'cutAdjustments');
+  steps.push('summaryReview', 'resultPreview', 'saveProfile');
+  return steps;
+}
+
+var SIL_CONFIGS = {
+  recto: { drop: 70, w: 1, asym:false, layered:false, bangs:null, pixie:false },
+  capas: { drop: 78, w: 1.05, asym:false, layered:true, bangs:null, pixie:false },
+  bob: { drop: 28, w: 1, asym:false, layered:false, bangs:null, pixie:false },
+  pixie: { drop: 6, w: .85, asym:false, layered:false, bangs:null, pixie:true },
+  shag: { drop: 55, w: 1.15, asym:false, layered:true, bangs:'cortina', pixie:false },
+  degradado: { drop: 40, w: .95, asym:false, layered:true, bangs:null, pixie:false },
+  asimetrico: { drop: 50, w: 1, asym:true, layered:false, bangs:null, pixie:false },
+  'flequillo-recto': { drop: 80, w: 1, asym:false, layered:false, bangs:'recto', pixie:false },
+  'flequillo-cortina': { drop: 80, w: 1, asym:false, layered:false, bangs:'cortina', pixie:false },
+  'flequillo-lateral': { drop: 80, w: 1, asym:false, layered:false, bangs:'lateral', pixie:false },
+  'sugerencia-x': { drop: 62, w: 1, asym:false, layered:true, bangs:null, pixie:false },
+  'sugerencia-y': { drop: 44, w: 1.05, asym:false, layered:false, bangs:'cortina', pixie:false },
+  base: { drop: 60, w: 1, asym:false, layered:false, bangs:null, pixie:false }
+};
+
+function resolveSil(variant) {
+  variant = variant || 'base';
+  var key = variant.indexOf('__') >= 0 ? variant.split('__')[0] : variant;
+  return SIL_CONFIGS[key] || SIL_CONFIGS[variant.split('-')[0]] || SIL_CONFIGS.base;
+}
+
+function svgSilhouette(variant) {
+  var cfg = resolveSil(variant);
+  var cx = 60, cy = 52, rx = 26, ry = 32;
+  var hairW = rx * (1 + 0.5 * cfg.w);
+  var dropL = cfg.drop * (cfg.asym ? 0.55 : 1);
+  var dropR = cfg.drop;
+  var shoulderY = cy + ry - 4;
+  var leftY = cfg.pixie ? shoulderY - 18 : shoulderY + dropL;
+  var rightY = cfg.pixie ? shoulderY - 14 : shoulderY + dropR;
+  var hairPath = 'M ' + (cx-rx+4) + ' ' + (cy-ry+10) + ' C ' + (cx-hairW) + ' ' + (cy-10) + ', ' + (cx-hairW) + ' ' + (cy+20) + ', ' + (cx-hairW+6) + ' ' + leftY +
+    ' M ' + (cx+rx-4) + ' ' + (cy-ry+10) + ' C ' + (cx+hairW) + ' ' + (cy-10) + ', ' + (cx+hairW) + ' ' + (cy+20) + ', ' + (cx+hairW-6) + ' ' + rightY;
+
+  var extra = '';
+  if (cfg.layered) {
+    extra += '<path d="M ' + (cx-hairW+12) + ' ' + (leftY-24) + ' q 8 10 0 20" fill="none" stroke="var(--color-accent)" stroke-width="1.6"/>';
+    extra += '<path d="M ' + (cx+hairW-12) + ' ' + (rightY-30) + ' q -8 10 0 20" fill="none" stroke="var(--color-accent)" stroke-width="1.6"/>';
+  }
+  if (cfg.bangs === 'recto') {
+    extra += '<line x1="' + (cx-rx+8) + '" y1="' + (cy-ry+20) + '" x2="' + (cx+rx-8) + '" y2="' + (cy-ry+20) + '" stroke="var(--color-ink)" stroke-width="1.6"/>';
+  }
+  if (cfg.bangs === 'cortina') {
+    extra += '<path d="M ' + (cx-rx+8) + ' ' + (cy-ry+16) + ' Q ' + (cx-14) + ' ' + (cy-ry+30) + ' ' + (cx-22) + ' ' + (cy-2) +
+      ' M ' + (cx+rx-8) + ' ' + (cy-ry+16) + ' Q ' + (cx+14) + ' ' + (cy-ry+30) + ' ' + (cx+22) + ' ' + (cy-2) + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>';
+  }
+  if (cfg.bangs === 'lateral') {
+    extra += '<path d="M ' + (cx-rx+10) + ' ' + (cy-ry+18) + ' Q ' + cx + ' ' + (cy-ry+8) + ' ' + (cx+rx-10) + ' ' + (cy-ry+26) + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>';
+  }
+  if (cfg.asym) {
+    extra += '<line x1="' + (cx+hairW-14) + '" y1="' + (rightY-6) + '" x2="' + (cx+hairW+2) + '" y2="' + (rightY+6) + '" stroke="var(--color-accent)" stroke-width="1.6"/>';
+  }
+
+  return '<svg viewBox="0 0 120 150">' +
+    '<path d="M ' + (cx-10) + ' ' + (cy+ry) + ' L ' + (cx-10) + ' ' + (cy+ry+16) + ' L ' + (cx+10) + ' ' + (cy+ry+16) + ' L ' + (cx+10) + ' ' + (cy+ry) + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<ellipse cx="' + cx + '" cy="' + cy + '" rx="' + rx + '" ry="' + ry + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<path d="M ' + (cx-rx+6) + ' ' + (cy-ry+14) + ' Q ' + cx + ' ' + (cy-ry-(cfg.pixie?2:10)) + ' ' + (cx+rx-6) + ' ' + (cy-ry+14) + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<path d="' + hairPath + '" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    extra +
+    '</svg>';
+}
+
+// Fotos de referencia generadas con IA (misma persona, fondo de estudio
+// neutro — ver hairvision/server/generar-fotos-referencia.js), guardadas
+// junto a este archivo en la carpeta "hairvision-fotos". Se usan en vez
+// del dibujo vectorial siempre que exista una foto para ese estilo; para
+// combinaciones que no tienen foto propia (p.ej. mezclas usadas solo en
+// la demo sin cámara) seguimos mostrando el dibujo como antes.
+var PHOTO_REF_KEYS = ['base', 'recto', 'capas', 'bob', 'pixie', 'shag', 'degradado', 'asimetrico',
+  'flequillo-recto', 'flequillo-cortina', 'flequillo-lateral', 'sugerencia-x', 'sugerencia-y'];
+function cardMedia(variant) {
+  var key = variant || 'base';
+  if (PHOTO_REF_KEYS.indexOf(key) !== -1) {
+    // object-fit:contain (no "cover") a propósito: en las tarjetas de
+    // selección se tiene que ver el corte ENTERO (toda la cabeza, sin
+    // cortar por arriba ni por los lados), aunque eso deje un poco de
+    // espacio vacío a los lados si la proporción de la tarjeta no
+    // coincide exactamente con la de la foto.
+    return '<img src="hairvision-fotos/' + key + '.jpg" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius-sm)">';
+  }
+  return svgSilhouette(variant);
+}
+
+// Ilustración de "Largada de Corte": DOS fotos reales con el MISMO
+// encuadre exacto (misma postura, mismo fondo, misma persona) — una con
+// el pelo corto (melena-corta.jpg, siempre visible entera, fija de fondo)
+// y otra con el pelo largo (melena-larga.jpg) recortada con una ventana
+// que se abre de arriba a abajo según el slider, TAPANDO a la de pelo
+// corto. Nada de mezclar opacidades (eso se veía borroso/fantasma): aquí
+// es un corte limpio, sin transparencias — por debajo de la ventana se
+// ve la foto de pelo corto tal cual, por encima se ve el pelo largo. Como
+// las dos fotos comparten encuadre, fondo y postura, el efecto es que la
+// espalda/hombros/fondo quedan fijos y solo el pelo parece crecer.
+function hairPhotoWindowPercent(value) {
+  var v = Math.max(0, Math.min(100, Number(value) || 0)) / 100;
+  return 4 + v * 96; // nunca 0 (evita líos con altura 0), hasta el 100%
+}
+function hairLengthMedia(value) {
+  var visiblePercent = hairPhotoWindowPercent(value);
+  return '<div style="position:relative;width:100%;height:100%;border-radius:var(--radius-md);overflow:hidden;background:var(--color-surface-sunken)">' +
+    '<img src="hairvision-fotos/melena-corta.jpg" alt="" ' +
+    'onerror="this.style.visibility=\'hidden\'" ' +
+    'style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">' +
+    '<div id="hairPhotoWindow" style="position:absolute;top:0;left:0;width:100%;height:' + visiblePercent.toFixed(1) + '%;overflow:hidden">' +
+    '<img src="hairvision-fotos/melena-larga.jpg" alt="" ' +
+    'onerror="this.style.visibility=\'hidden\'" ' +
+    'style="width:100%;height:' + (10000 / visiblePercent).toFixed(1) + '%;display:block;object-fit:cover;object-position:top">' +
+    '</div></div>';
+}
+
+// Miniatura para la fila de "Reducción de volumen" en el carrito: un
+// círculo más pequeño si se reduce volumen, más grande si se deja natural.
+function volumeIconSvg(reduced) {
+  var r = reduced ? 12 : 18;
+  return '<svg viewBox="0 0 40 50" style="width:100%;height:100%">' +
+    '<circle cx="20" cy="25" r="' + r + '" fill="none" stroke="var(--color-accent)" stroke-width="2"/>' +
+    '</svg>';
+}
+
+var ICONS = {
+  back: '<svg viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  next: '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  home: '<svg viewBox="0 0 24 24"><path d="M4 11.5 12 5l8 6.5M6 10v8h12v-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M3 5h2l1.6 9.6a2 2 0 0 0 2 1.7h7.8a2 2 0 0 0 2-1.6L20 8H6.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="20" r="1.3" fill="currentColor"/><circle cx="16.5" cy="20" r="1.3" fill="currentColor"/></svg>',
+  camera: '<svg viewBox="0 0 64 52"><rect x="2" y="12" width="60" height="36" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M20 12 24 4h16l4 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="32" cy="30" r="12" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="32" cy="30" r="5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>',
+  check: '<svg viewBox="0 0 64 52"><circle cx="32" cy="26" r="20" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M22 27 29 34 43 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+
+/* ---------- state ---------- */
+// Rangos de edad en bloques de 5 años, para que la clienta elija una franja
+// sin tener que decir su edad exacta.
+var AGE_RANGES = ['-18','18-22','23-27','28-32','33-37','38-42','43-47','48-52','53-57','58-62','63-67','68+'];
+
+// Estas cinco escalas ahora son continuas (0-100), no categorías fijas: la
+// peluquera puede dejar el slider a medio camino entre dos etiquetas
+// (ej. entre "Ondulado" y "Rizado") en vez de tener que encajar en una sola.
+function emptyProfile() {
+  return {
+    name: '', ageRange: '', capturedPhoto: null,
+    hairStructure: { type: 50, thickness: 50, density: 50 },
+    behavior: { naturalVolume: 50, elasticity: 50 },
+    condition: { damageLevel: 20, teñido:false, decolorado:false },
+    growthDirection: null,
+    hasWhorl: false,
+    growthWhorlPositions: []
+  };
+}
+var emptySelections = { suggestion:null, haircutType:null, bangs:null, lengthValue:60, volumeReduction:false };
+
+var state = {
+  stepIndex: 0,
+  profile: emptyProfile(),
+  selections: JSON.parse(JSON.stringify(emptySelections)),
+  ui: {
+    picking: false, savedProfiles: [],
+    showGrowthHelp: false, showWhorlPicker: false, cameraActive: false, cameraStream: null, cameraError: null,
+    subview: 'none', // cutAdjustments
+    resultStatus: 'loading', resultData: null, resultTimer: null,
+    saved: false,
+    compareExpanded: null, holding: false,
+    showCartPreview: false
+  }
+};
+
+function loadSavedProfiles() {
+  try { return JSON.parse(localStorage.getItem('hairvision.preview.profiles') || '[]'); }
+  catch (e) { return []; }
+}
+function persistProfiles(list) {
+  try { localStorage.setItem('hairvision.preview.profiles', JSON.stringify(list)); } catch (e) {}
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+
+/* ---------- navigation ---------- */
+function currentStep() { return getFlowSteps()[state.stepIndex]; }
+function goNext() {
+  if (currentStep() === 'resultPreview' && state.ui.resultStatus !== 'ready') return;
+  state.stepIndex = Math.min(state.stepIndex + 1, getFlowSteps().length - 1);
+  onStepChange();
+  render();
+}
+function goBack() {
+  if (currentStep() === 'cutAdjustments' && state.ui.subview !== 'none') {
+    state.ui.subview = 'none';
+    render();
+    return;
+  }
+  state.stepIndex = Math.max(state.stepIndex - 1, 0);
+  onStepChange();
+  render();
+}
+function goHome() {
+  state.stepIndex = 0;
+  onStepChange();
+  render();
+}
+function onStepChange() {
+  clearResultTimer();
+  stopCameraStream();
+}
+
+function cartCount() {
+  var s = state.selections;
+  var count = 0;
+  // "Ninguna me convence" no es una elección real de corte — no cuenta.
+  if (s.suggestion && s.suggestion !== 'none') count++;
+  if (s.haircutType) count++;
+  if (s.bangs) count++;
+  // La largada siempre tiene un valor real (no un estado "sin elegir"),
+  // así que siempre cuenta 1.
+  count++;
+  // La reducción de volumen solo cuenta si está activada.
+  if (s.volumeReduction) count++;
+  return count;
+}
+
+/* ---------- screen renderers (return HTML strings) ---------- */
+function screenHeader(title, showCart) {
+  return '<header class="hv-header"><h1 class="hv-title">' + esc(title) + '</h1>' +
+    (showCart ? '<button class="hv-cart" id="cartBadge">' + ICONS.cart + '<span>' + cartCount() + '</span></button>' : '') +
+    '</header>';
+}
+
+// Panel que aparece al tocar el carrito: muestra lo elegido hasta ahora
+// (sugerencia de IA aceptada, tipo de corte, flequillo), con opción de
+// quitar cada elección — igual que un mini-carrito de compra.
+function renderCartPreview() {
+  var s = state.selections;
+  var suggestion = SUGGESTION_OPTIONS.filter(function (o) { return o.id === s.suggestion; })[0];
+  var haircut = HAIRCUT_TYPES.filter(function (o) { return o.id === s.haircutType; })[0];
+  var bangs = BANGS_TYPES.filter(function (o) { return o.id === s.bangs; })[0];
+  var items = [];
+  if (suggestion) items.push({ key: 'suggestion', sub: 'Sugerencia de IA', label: suggestion.label, media: cardMedia(suggestion.sil) });
+  if (haircut) items.push({ key: 'haircutType', sub: 'Tipo de corte', label: haircut.label, media: cardMedia(haircut.sil) });
+  if (bangs) items.push({ key: 'bangs', sub: 'Flequillo', label: bangs.label, media: cardMedia(bangs.sil) });
+  // La largada ya no se ve como número en su propia pantalla — se
+  // muestra aquí, en el carrito, con el porcentaje y una miniatura del
+  // mismo dibujo que crece/mengua.
+  items.push({ key: 'length', sub: 'Largada de corte', label: s.lengthValue + '%', media: hairLengthMedia(s.lengthValue) });
+  // Solo aparece si está activada — a diferencia de la largada, aquí "No"
+  // sí es un estado neutro que no merece ocupar sitio en el carrito.
+  if (s.volumeReduction) items.push({ key: 'volumeReduction', sub: 'Reducción de volumen', label: 'Sí', media: volumeIconSvg(true) });
+
+  var rows = items.map(function (it) {
+    return '<div class="hv-cart-row">' +
+      '<div class="hv-cart-row-media">' + it.media + '</div>' +
+      '<div class="hv-cart-row-info"><span class="hv-cart-row-sub">' + esc(it.sub) + '</span><span class="hv-cart-row-label">' + esc(it.label) + '</span></div>' +
+      '<button class="hv-cart-row-remove" data-remove-cart-item="' + it.key + '" aria-label="Quitar">&times;</button>' +
+      '</div>';
+  }).join('');
+
+  return '<div class="hv-overlay" id="cartPreviewOverlay" style="align-items:flex-start;justify-content:flex-end;padding:6.5rem 3rem 0 0">' +
+    '<div class="hv-sheet" style="width:340px;max-height:60vh" id="cartPreviewSheet">' +
+    '<h2 style="font-size:1.0625rem;font-weight:600;margin:0">Tu selección</h2>' +
+    (items.length === 0
+      ? '<p style="color:var(--color-ink-muted);font-size:.875rem;margin:0">Todavía no has elegido nada.</p>'
+      : '<div style="display:flex;flex-direction:column;gap:.75rem;overflow-y:auto">' + rows + '</div>') +
+    '<button class="hv-btn ghost" id="closeCartPreview">Cerrar</button>' +
+    '</div></div>';
+}
+
+function renderHome() {
+  var pickerHtml = '';
+  if (state.ui.picking) {
+    var items = state.ui.savedProfiles.map(function (p, i) {
+      return '<button class="hv-row" style="justify-content:space-between;cursor:pointer" data-load-profile="' + i + '">' +
+        '<span>' + esc(p.name || 'Sin nombre') + '</span><span style="color:var(--color-ink-muted)">' + esc(p.ageRange || '—') + '</span></button>';
+    }).join('');
+    pickerHtml = '<div class="hv-overlay" id="homeOverlay"><div class="hv-sheet" id="homeSheet">' +
+      '<h2 style="font-size:1.25rem;font-weight:600;margin:0">Perfiles guardados</h2>' +
+      (state.ui.savedProfiles.length === 0 ? '<p style="color:var(--color-ink-muted)">Todavía no hay perfiles guardados.</p>' : '') +
+      '<div style="display:flex;flex-direction:column;gap:.5rem;overflow-y:auto;max-height:40vh">' + items + '</div>' +
+      '<button class="hv-btn ghost" id="closePicker">Cerrar</button>' +
+      '</div></div>';
+  }
+  return '<div class="hv-screen" style="align-items:center;justify-content:center">' +
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:4rem">' +
+    '<h1 style="font-size:2.75rem;letter-spacing:.22em;text-transform:uppercase;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0;color:var(--color-ink)">Hair Visi' +
+    '<span style="display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;margin:0 4px;position:relative;top:-1px;color:var(--color-accent)"><svg viewBox="0 0 40 32" style="width:100%;height:auto;display:block"><rect x="1" y="7" width="38" height="23" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7 15 2h10l3 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="20" cy="19" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="20" cy="19" r="3.4" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></span>n</h1>' +
+    '<div style="display:flex;gap:1.25rem">' +
+    '<button class="hv-btn primary" id="newClientBtn">Nuevo Cliente +</button>' +
+    '<button class="hv-btn outline" id="loadProfileBtn">Cargar Perfil</button>' +
+    '</div></div>' + pickerHtml + '</div>';
+}
+
+function renderGrowthHelp() {
+  return '<div class="hv-overlay" id="growthHelpOverlay"><div class="hv-sheet" style="align-items:center">' +
+    '<h2 style="font-size:1.1rem;font-weight:600;text-align:center;margin:0">Referencia: dirección del crecimiento</h2>' +
+    '<svg viewBox="0 0 420 260" style="width:100%;max-width:420px">' +
+    '<path d="M60 40 C20 55 10 100 20 140 C26 165 40 185 55 200 L55 230 L95 230 L95 205 C110 200 118 195 120 185 L118 150 C130 148 138 140 136 128 L120 95 C112 60 90 42 60 40 Z" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<circle cx="112" cy="55" r="10" fill="none" stroke="var(--color-success)" stroke-width="1.6"/>' +
+    '<circle cx="47" cy="125" r="10" fill="none" stroke="var(--color-success)" stroke-width="1.6"/>' +
+    '<ellipse cx="300" cy="120" rx="70" ry="88" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<path d="M282 34 Q300 20 318 34" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<circle cx="335" cy="185" r="10" fill="none" stroke="var(--color-success)" stroke-width="1.6"/>' +
+    '<line x1="112" y1="55" x2="325" y2="180" stroke="var(--color-ink)" stroke-width="1.2"/>' +
+    '</svg>' +
+    '<p style="font-size:.875rem;color:var(--color-ink-muted);text-align:center">Localiza el remolino y el nacimiento del cabello antes de elegir la dirección de crecimiento.</p>' +
+    '<button class="hv-btn outline" id="closeGrowthHelp">Cerrar</button>' +
+    '</div></div>';
+}
+
+// Slider continuo (0-100): las etiquetas son puntos de referencia sobre la
+// barra, no paradas obligatorias — se puede dejar el valor a medio camino
+// entre dos, ej. entre "Ondulado" y "Rizado".
+// Umbral del "imán": si el valor cae a menos de esta distancia (sobre 100)
+// de una etiqueta, se pega a ella. Entre imanes, el valor es libre.
+var SLIDER_SNAP_THRESHOLD = 4;
+
+function steppedSlider(id, label, ticks, value) {
+  var n = ticks.length;
+  var nearest = Math.round((value / 100) * (n - 1));
+  var ticksHtml = ticks.map(function (t, i) {
+    var pct = (i / (n - 1)) * 100;
+    var align = i === 0 ? 'left:0;' : i === n - 1 ? 'left:100%;transform:translateX(-100%);' : 'left:' + pct + '%;transform:translateX(-50%);';
+    return '<span class="hv-tick hv-tick-abs' + (i === nearest ? ' active' : '') + '" style="' + align + '">' + esc(t) + '</span>';
+  }).join('');
+  return '<div class="hv-slider-block">' +
+    '<p class="hv-slider-label">' + esc(label) + '</p>' +
+    '<input type="range" min="0" max="100" step="1" value="' + value + '" class="hv-slider-input" data-stepped-slider="' + id + '" data-ticks="' + n + '">' +
+    '<div class="hv-slider-ticks-abs" id="ticks-' + id + '">' + ticksHtml + '</div></div>';
+}
+function continuousSlider(id, leftLabel, rightLabel, value, min, max, showPercent) {
+  min = min == null ? 0 : min; max = max == null ? 100 : max;
+  var mid = (min + max) / 2;
+  var leftActive = Number(value) <= mid;
+  var percentHtml = showPercent ? '<p class="hv-slider-percent" id="percent-' + id + '">' + value + '%</p>' : '';
+  return '<div class="hv-slider-block">' +
+    percentHtml +
+    '<input type="range" min="' + min + '" max="' + max + '" value="' + value + '" class="hv-slider-input" data-continuous-slider="' + id + '">' +
+    '<div class="hv-slider-ticks">' +
+    '<span class="hv-tick' + (leftActive ? ' active' : '') + '" id="tick-left-' + id + '">' + esc(leftLabel) + '</span>' +
+    '<span class="hv-tick' + (!leftActive ? ' active' : '') + '" id="tick-right-' + id + '">' + esc(rightLabel) + '</span>' +
+    '</div></div>';
+}
+// Actualiza en vivo cuál de las dos etiquetas de un slider continuo se
+// pone en negrita (la más cercana al valor actual), sin volver a pintar
+// toda la pantalla — mismo patrón que el imán de los sliders con nombre.
+function updateContinuousTickHighlight(id, value) {
+  var leftEl = document.getElementById('tick-left-' + id);
+  var rightEl = document.getElementById('tick-right-' + id);
+  if (!leftEl || !rightEl) return;
+  var input = document.querySelector('[data-continuous-slider="' + id + '"]');
+  var min = input ? Number(input.min) : 0;
+  var max = input ? Number(input.max) : 100;
+  var leftActive = Number(value) <= (min + max) / 2;
+  leftEl.classList.toggle('active', leftActive);
+  rightEl.classList.toggle('active', !leftActive);
+}
+function toggleGroup(idPrefix, options, activeIds, columns) {
+  var items = options.map(function (opt) {
+    var active = activeIds.indexOf(opt.id) >= 0;
+    return '<button class="hv-toggle' + (active ? ' active' : '') + '" data-toggle="' + idPrefix + '" data-toggle-id="' + opt.id + '">' + esc(opt.label) + '</button>';
+  }).join('');
+  return '<div class="hv-toggle-grid" style="grid-template-columns:repeat(' + columns + ',1fr)">' + items + '</div>';
+}
+
+function renderClientProfile() {
+  var p = state.profile;
+  var ui = state.ui;
+  var recordArea;
+  if (ui.cameraActive) {
+    recordArea = '<div class="hv-record" id="cameraArea" style="padding:0;overflow:hidden;position:relative">' +
+      '<video id="cameraVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-md);background:#000"></video>' +
+      '<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;padding:12px 10px 78px;pointer-events:none">' +
+      '<span style="background:rgba(33,29,23,.6);color:#fff;font-size:.7rem;font-weight:600;padding:5px 12px;border-radius:999px;text-align:center;max-width:90%;line-height:1.3">Encuadra la cara dentro del óvalo</span>' +
+      '<svg viewBox="0 0 160 220" style="width:56%;max-width:150px;flex:1;min-height:0" preserveAspectRatio="xMidYMid meet"><ellipse cx="80" cy="110" rx="62" ry="98" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="3" stroke-dasharray="7 6"/></svg>' +
+      '<span style="background:rgba(33,29,23,.6);color:#fff;font-size:.7rem;padding:5px 12px;border-radius:8px;text-align:center;max-width:90%;line-height:1.35">Si tiene el pelo largo, pídele que lo lleve hacia delante para verlo junto a la cara</span>' +
+      '</div>' +
+      '<div style="position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:.6rem">' +
+      '<button class="hv-btn outline" id="cancelCameraBtn" style="min-width:auto;padding:.55rem 1.1rem;font-size:.875rem">Cancelar</button>' +
+      '<button class="hv-btn primary" id="captureCameraBtn" style="min-width:auto;padding:.55rem 1.1rem;font-size:.875rem">Capturar</button>' +
+      '</div></div>';
+  } else if (p.capturedPhoto) {
+    recordArea = '<button class="hv-record" id="recordBtn" style="padding:0;overflow:hidden;position:relative">' +
+      '<img src="' + p.capturedPhoto + '" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius-md)" alt="Foto de la clienta">' +
+      '<span style="position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:.75rem;background:rgba(33,29,23,.55);color:#fff;padding:5px 0">Toca para repetir la foto</span>' +
+      '</button>';
+  } else {
+    recordArea = '<button class="hv-record" id="recordBtn">' + '<span class="hv-icon-camera">' + ICONS.camera + '</span>' +
+      '<span style="font-size:1.1rem;font-weight:600">Tomar foto</span>' +
+      (ui.cameraError ? '<span style="font-size:.75rem;color:var(--color-selected);text-align:center;padding:0 1rem;line-height:1.4">' + esc(ui.cameraError) + '</span>' : '') +
+      '</button>';
+  }
+
+  var conditionActive = [];
+  if (p.condition.teñido) conditionActive.push('teñido');
+  if (p.condition.decolorado) conditionActive.push('decolorado');
+
+  return '<div class="hv-screen">' +
+    '<div style="flex:1;display:grid;grid-template-columns:300px 1fr;gap:3rem;min-height:0">' +
+    '<div style="display:flex;flex-direction:column;gap:1.5rem">' +
+    recordArea +
+    '<div style="display:flex;flex-direction:column;gap:.75rem">' +
+    '<input class="hv-input" placeholder="Nombre" id="nameInput" value="' + esc(p.name) + '">' +
+    '<p class="hv-slider-label" style="margin-top:.25rem">Rango de edad</p>' +
+    toggleGroup('ageRange', AGE_RANGES.map(function (r) { return { id: r, label: r }; }), p.ageRange ? [p.ageRange] : [], 3) +
+    '</div></div>' +
+    '<div style="display:flex;flex-direction:column;gap:2rem;overflow-y:auto;padding-right:3rem;padding-bottom:2rem">' +
+    '<section class="hv-section"><h2 class="hv-section-title">Estructura de Pelo</h2>' +
+      steppedSlider('hairType', 'Tipo de Cabello', ['Liso','Ondulado','Rizado','Afro'], p.hairStructure.type) +
+      steppedSlider('thickness', 'Grosor del Cabello', ['Fino','Medio','Grueso'], p.hairStructure.thickness) +
+      steppedSlider('density', 'Densidad del Cabello', ['Baja','Media','Alta'], p.hairStructure.density) +
+    '</section>' +
+    '<section class="hv-section"><h2 class="hv-section-title">Comportamiento</h2>' +
+      steppedSlider('volume', 'Volumen Natural', ['Bajo','Medio','Alto'], p.behavior.naturalVolume) +
+      steppedSlider('elasticity', 'Elasticidad', ['Baja','Media','Alta'], p.behavior.elasticity) +
+    '</section>' +
+    '<section class="hv-section"><h2 class="hv-section-title">Estado del Cabello</h2>' +
+      continuousSlider('damage', 'Natural', 'Dañado', p.condition.damageLevel) +
+      toggleGroup('condition', [{id:'teñido',label:'Teñido'},{id:'decolorado',label:'Decolorado'}], conditionActive, 2) +
+    '</section>' +
+    '<section class="hv-section">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
+      '<h2 class="hv-section-title">Dirección del Crecimiento</h2>' +
+      '<button id="growthHelpBtn" style="width:28px;height:28px;border-radius:50%;border:1px solid var(--color-line);background:var(--color-surface)">?</button>' +
+      '</div>' +
+      toggleGroup('growth', [{id:'frontal',label:'Frontal'},{id:'lateral',label:'Lateral'},{id:'mixto',label:'Mixto'}], p.growthDirection ? [p.growthDirection] : [], 3) +
+      '<p style="font-size:.75rem;color:var(--color-ink-muted);margin:.25rem 0 0">Independiente de lo anterior — puede combinarse con cualquier dirección:</p>' +
+      '<button id="whorlToggleBtn" class="hv-toggle' + (p.hasWhorl ? ' active' : '') + '" style="align-self:flex-start;min-width:160px">Tiene remolino</button>' +
+      (p.hasWhorl ? renderWhorlSummary(p) : '') +
+    '</section>' +
+    '</div></div>' +
+    (ui.showGrowthHelp ? renderGrowthHelp() : '') +
+    (ui.showWhorlPicker ? renderWhorlPicker(p) : '') +
+    '</div>';
+}
+
+// Cabeza vista desde arriba/atrás — es el lienzo donde se toca para marcar
+// el remolino en el punto exacto (coordenadas en % dentro de este óvalo).
+// Vista 1: cabeza vista desde arriba (para remolinos en la coronilla).
+function whorlCanvasSvg() {
+  return '<svg viewBox="0 0 300 300" style="width:100%;height:100%;position:absolute;inset:0;pointer-events:none">' +
+    '<ellipse cx="150" cy="155" rx="118" ry="138" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<path d="M128 20 Q150 4 172 20" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<ellipse cx="105" cy="60" rx="10" ry="6" fill="none" stroke="var(--color-ink-faint)" stroke-width="1.2"/>' +
+    '<ellipse cx="195" cy="60" rx="10" ry="6" fill="none" stroke="var(--color-ink-faint)" stroke-width="1.2"/>' +
+    '</svg>';
+}
+// Vista 2: cabeza vista de espaldas (para remolinos en la nuca, que la
+// vista de arriba no puede mostrar bien). Silueta más ancha y realista:
+// cráneo con anchura de verdad a la altura de las orejas, cuello y
+// hombros recortados por el borde del lienzo, como en una foto real.
+function whorlBackCanvasSvg() {
+  return '<svg viewBox="0 0 300 300" style="width:100%;height:100%;position:absolute;inset:0;pointer-events:none">' +
+    '<path d="M150,18 C195,18 235,45 242,95 C246,120 248,140 245,158 C242,178 232,200 213,213 C205,222 197,228 190,233 C196,245 205,252 215,258 C245,270 280,285 300,300 L0,300 C20,285 55,270 85,258 C95,252 104,245 110,233 C103,228 95,222 87,213 C68,200 58,178 55,158 C52,140 54,120 58,95 C65,45 105,18 150,18 Z" fill="none" stroke="var(--color-ink)" stroke-width="1.6"/>' +
+    '<path d="M244,130 Q260,135 258,158 Q256,178 240,180" fill="none" stroke="var(--color-ink-faint)" stroke-width="1.2"/>' +
+    '<path d="M56,130 Q40,135 42,158 Q44,178 60,180" fill="none" stroke="var(--color-ink-faint)" stroke-width="1.2"/>' +
+    '<line x1="60" y1="' + WHORL_CROWN_ZONE_MAX_Y * 3 + '" x2="240" y2="' + WHORL_CROWN_ZONE_MAX_Y * 3 + '" stroke="var(--color-ink-faint)" stroke-width="1" stroke-dasharray="2,5"/>' +
+    '<line x1="118" y1="213" x2="182" y2="213" stroke="var(--color-ink-faint)" stroke-width="1" stroke-dasharray="3,4"/>' +
+    '<text x="150" y="228" font-size="11" text-anchor="middle" fill="var(--color-ink-faint)">nuca</text>' +
+    '</svg>';
+}
+// El óvalo "desde arriba" representa la coronilla como una gorra: su
+// centro es el vértice más alto de la cabeza, y un punto se acerca al
+// borde de esa gorra según lo lejos que esté del centro EN CUALQUIER
+// DIRECCIÓN (no solo hacia atrás) — un punto pegado al lateral del óvalo,
+// aunque esté a la misma "altura" que el centro, está tan lejos del
+// vértice como uno pegado al borde trasero. Por eso la traducción entre
+// vistas usa la distancia radial al centro del óvalo: el centro cae en
+// el vértice de la vista de atrás, y el borde del óvalo (en cualquier
+// dirección) cae donde la cabeza ya se ha ensanchado de verdad, justo
+// por encima de las orejas — no en una franja plana cerca de arriba.
+var WHORL_CROWN_APEX_VB = 18; // vértice de la coronilla en la vista de atrás (radial=0)
+var WHORL_CROWN_EDGE_VB = 95; // borde de la franja de coronilla (radial=1), donde la cabeza se ensancha
+var WHORL_CROWN_ZONE_MAX_Y = WHORL_CROWN_EDGE_VB / 3; // % de la vista "de atrás"
+// Geometría de las dos siluetas (en unidades del viewBox, 0-300), para
+// saber la anchura real de la cabeza a cada altura — así un toque fuera
+// de la silueta se ignora.
+var WHORL_TOP_CX = 150, WHORL_TOP_CY = 155, WHORL_TOP_RX = 118, WHORL_TOP_RY = 138;
+function ovalNormFromClick(px, py) {
+  var nx = (px - WHORL_TOP_CX) / WHORL_TOP_RX;
+  var ny = (py - WHORL_TOP_CY) / WHORL_TOP_RY;
+  return { nx: nx, ny: ny, radial: Math.sqrt(nx * nx + ny * ny) };
+}
+var WHORL_BACK_CX = 150;
+var WHORL_BACK_PROFILE = [
+  { y: 18, hw: 0 }, { y: 95, hw: 92 }, { y: 140, hw: 98 }, { y: 158, hw: 95 },
+  { y: 213, hw: 63 }, { y: 233, hw: 40 }, { y: 258, hw: 65 }, { y: 300, hw: 150 }
+];
+function backHalfWidthAtY(y) {
+  var pts = WHORL_BACK_PROFILE;
+  if (y <= pts[0].y) return pts[0].hw;
+  if (y >= pts[pts.length - 1].y) return pts[pts.length - 1].hw;
+  for (var i = 0; i < pts.length - 1; i++) {
+    if (y >= pts[i].y && y <= pts[i + 1].y) {
+      var t = (y - pts[i].y) / (pts[i + 1].y - pts[i].y);
+      return pts[i].hw + t * (pts[i + 1].hw - pts[i].hw);
+    }
+  }
+  return pts[pts.length - 1].hw;
+}
+// Cada remolino se guarda de una de dos formas: "crown" (dentro de la
+// franja visible desde arriba, en coordenadas normalizadas del óvalo
+// nx/ny, -1 a 1) o "nape" (solo visible desde atrás, con y en % de esa
+// vista y r relativo a la anchura real de esa altura). Estas funciones
+// traducen cada una a coordenadas de pantalla (% del lienzo) por vista.
+function whorlPointForTopView(pos) {
+  if (pos.zone !== 'crown') return null;
+  return { x: (WHORL_TOP_CX + pos.nx * WHORL_TOP_RX) / 3, y: (WHORL_TOP_CY + pos.ny * WHORL_TOP_RY) / 3 };
+}
+function whorlPointForBackView(pos) {
+  if (pos.zone === 'crown') {
+    // La mitad delantera del óvalo (ny<0, hacia la frente) no se puede
+    // ver nunca desde atrás — no tiene sentido que aparezca un punto ahí.
+    if (pos.ny < 0) return null;
+    var radial = Math.sqrt(pos.nx * pos.nx + pos.ny * pos.ny);
+    var sideR = radial > 0.001 ? pos.nx / radial : 0;
+    var canonicalY = (WHORL_CROWN_APEX_VB + radial * (WHORL_CROWN_EDGE_VB - WHORL_CROWN_APEX_VB)) / 3;
+    var hw = backHalfWidthAtY(canonicalY * 3);
+    return { x: (WHORL_BACK_CX + sideR * hw) / 3, y: canonicalY };
+  }
+  var hwNape = backHalfWidthAtY(pos.y * 3);
+  return { x: (WHORL_BACK_CX + pos.r * hwNape) / 3, y: pos.y };
+}
+
+function renderWhorlPicker(p) {
+  var positions = p.growthWhorlPositions || [];
+  // La vista de atrás pinta todos los puntos; el óvalo de arriba solo
+  // pinta los que son de la zona "crown" (visible desde arriba).
+  var markersTop = positions.filter(function (pos) {
+    return pos.zone === 'crown';
+  }).map(function (pos) {
+    var pt = whorlPointForTopView(pos);
+    return '<div class="hv-whorl-marker" style="left:' + pt.x + '%;top:' + pt.y + '%"></div>';
+  }).join('');
+  var markersBack = positions.map(function (pos) {
+    return whorlPointForBackView(pos);
+  }).filter(function (pt) {
+    return pt !== null;
+  }).map(function (pt) {
+    return '<div class="hv-whorl-marker" style="left:' + pt.x + '%;top:' + pt.y + '%"></div>';
+  }).join('');
+  var countLabel = positions.length === 0 ? 'Sin marcar todavía' : positions.length === 1 ? '1 remolino marcado' : positions.length + ' remolinos marcados';
+  return '<div class="hv-overlay" id="whorlPickerOverlay">' +
+    '<div class="hv-sheet" style="align-items:center;width:min(720px,94vw);max-width:720px" id="whorlSheet">' +
+    '<h2 style="font-size:1.1rem;font-weight:600;text-align:center;margin:0">Toca el punto donde está el remolino</h2>' +
+    '<p style="font-size:.8125rem;color:var(--color-ink-muted);text-align:center;margin:0">Puede estar en la coronilla o en la nuca — usa la vista que mejor lo muestre, las dos están conectadas. Toca para añadir, vuelve a tocar un pin para quitarlo. Puedes marcar varios.</p>' +
+    '<div style="display:flex;gap:1.25rem;justify-content:center;flex-wrap:nowrap">' +
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">' +
+    '<span class="hv-slider-label" style="margin:0">Desde arriba</span>' +
+    '<div class="hv-whorl-canvas" id="whorlCanvasTop">' + whorlCanvasSvg() + markersTop + '</div>' +
+    '</div>' +
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:.5rem">' +
+    '<span class="hv-slider-label" style="margin:0">Desde atrás (nuca)</span>' +
+    '<div class="hv-whorl-canvas" id="whorlCanvasBack">' + whorlBackCanvasSvg() + markersBack + '</div>' +
+    '</div>' +
+    '</div>' +
+    '<p style="font-size:.8125rem;color:var(--color-accent);font-weight:600;margin:0">' + countLabel + '</p>' +
+    '<div style="display:flex;gap:.75rem">' +
+    '<button class="hv-btn ghost" id="clearWhorlPositions">Borrar todo</button>' +
+    '<button class="hv-btn primary" id="confirmWhorlPicker">Confirmar</button>' +
+    '</div></div></div>';
+}
+
+function renderWhorlSummary(p) {
+  var n = (p.growthWhorlPositions || []).length;
+  var text = n === 0 ? 'Sin marcar — toca aquí' : n === 1 ? 'Marcado — toca para ajustar' : n + ' marcados — toca para ajustar';
+  return '<button id="reopenWhorlPicker" class="hv-row" style="justify-content:space-between;cursor:pointer;margin-top:-.5rem">' +
+    '<span>Posición del remolino</span>' +
+    '<span style="color:var(--color-accent);font-weight:600">' + text + '</span>' +
+    '</button>';
+}
+
+function renderSuggestions() {
+  var s = state.selections;
+  var cards = SUGGESTION_OPTIONS.map(function (opt) {
+    return '<button class="hv-card suggestion-card' + (s.suggestion === opt.id ? ' selected' : '') + '" data-suggestion="' + opt.id + '">' +
+      '<span class="hv-ai-badge">✨ Generado con IA</span>' +
+      '<div class="hv-card-media">' + cardMedia(opt.sil) + '</div>' +
+      '<span class="hv-card-label">' + esc(opt.label) + '</span>' +
+      '<span class="hv-card-desc">' + esc(opt.desc) + '</span>' +
+      '</button>';
+  }).join('');
+  var noneActive = s.suggestion === 'none';
+  return '<div class="hv-screen">' + screenHeader('Sugerencias Según el Tipo de Cabello', true) +
+    '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem">' +
+    '<div class="hv-grid hv-grid-2" style="width:100%;max-width:760px;flex:none">' + cards + '</div>' +
+    '<button class="hv-reject-btn' + (noneActive ? ' active' : '') + '" data-suggestion="none">' +
+      '<span class="hv-reject-x">&times;</span><span>Ninguna me convence</span>' +
+    '</button>' +
+    '</div></div>';
+}
+
+function renderHaircutTypes() {
+  var s = state.selections;
+  function cardHtml(opt) {
+    return '<button class="hv-card compact' + (s.haircutType === opt.id ? ' selected' : '') + '" data-haircut="' + opt.id + '">' +
+      '<div class="hv-card-media">' + cardMedia(opt.sil) + '</div><span class="hv-card-label">' + esc(opt.label) + '</span></button>';
+  }
+  // Filas fijas: 4 arriba, 3 abajo (ver comentario de .hv-grid-row en el
+  // CSS) — así las dos filas se reparten el alto disponible y ninguna
+  // tarjeta se corta ni se superpone con la otra fila.
+  var row1 = HAIRCUT_TYPES.slice(0, 4).map(cardHtml).join('');
+  var row2 = HAIRCUT_TYPES.slice(4).map(cardHtml).join('');
+  return '<div class="hv-screen">' + screenHeader('Tipos de Cortes', true) +
+    '<div class="hv-grid-rows"><div class="hv-grid-row">' + row1 + '</div><div class="hv-grid-row">' + row2 + '</div></div></div>';
+}
+
+function renderCutAdjustments() {
+  var s = state.selections;
+  if (state.ui.subview === 'bangs') {
+    var cards = BANGS_TYPES.map(function (opt) {
+      return '<button class="hv-card suggestion-card' + (s.bangs === opt.id ? ' selected' : '') + '" data-bangs="' + opt.id + '">' +
+        '<div class="hv-card-media">' + cardMedia(opt.sil) + '</div><span class="hv-card-label">' + esc(opt.label) + '</span></button>';
+    }).join('');
+    return '<div class="hv-screen">' + screenHeader('Flequillo', true) +
+      '<div style="flex:1;display:flex;align-items:center;justify-content:center">' +
+      '<div class="hv-grid hv-grid-3" style="width:100%;max-width:900px;flex:none">' + cards + '</div>' +
+      '</div></div>';
+  }
+  if (state.ui.subview === 'length') {
+    return '<div class="hv-screen">' + screenHeader('Largada de Corte', false) +
+      '<div style="flex:1;display:flex;align-items:center;justify-content:center;gap:3.5rem">' +
+      '<div style="width:300px;height:460px;flex:none">' + hairLengthMedia(s.lengthValue) + '</div>' +
+      '<div style="width:420px;max-width:45%">' + continuousSlider('length', 'Corto', 'Largo', s.lengthValue) + '</div>' +
+      '</div></div>';
+  }
+  return '<div class="hv-screen">' + screenHeader('Ajustes de Corte', true) +
+    '<div style="flex:1;display:flex;align-items:center;justify-content:center">' +
+    '<div class="hv-grid" style="grid-template-columns:repeat(3,1fr);width:100%;max-width:840px;flex:none">' +
+    '<button class="hv-tile" id="openBangs">Flequillo</button>' +
+    '<button class="hv-tile" id="openLength">Largada de Corte</button>' +
+    '<button class="hv-tile' + (s.volumeReduction ? ' active' : '') + '" id="toggleVolume">Reducción de Volumen</button>' +
+    '</div></div></div>';
+}
+
+function renderSummaryReview() {
+  var p = state.profile, s = state.selections;
+  var acceptedAiSuggestion = s.suggestion === 'x' || s.suggestion === 'y';
+  var suggestion = SUGGESTION_OPTIONS.filter(function (o) { return o.id === s.suggestion; })[0];
+  var haircut = HAIRCUT_TYPES.filter(function (o) { return o.id === s.haircutType; })[0];
+  var bangs = BANGS_TYPES.filter(function (o) { return o.id === s.bangs; })[0];
+  function row(label, value, sil) {
+    return '<div class="hv-row">' + (sil ? '<div class="hv-row-media">' + cardMedia(sil) + '</div>' : '') +
+      '<div><span class="hv-row-label">' + esc(label) + '</span><span class="hv-row-value">' + esc(value) + '</span></div></div>';
+  }
+
+  // Tanto si se aceptó una sugerencia de IA como si se eligió todo a mano,
+  // el resumen se ve exactamente igual: al aceptar X/Y ya se rellenaron
+  // tipo de corte/flequillo/largo/volumen automáticamente (ver wireEvents,
+  // paso "suggestions"), así que estas filas siempre reflejan datos reales.
+  var body = row('Clienta', (p.name || 'Sin nombre') + ' · ' + (p.ageRange || 'sin rango de edad')) +
+    row('Sugerencia', acceptedAiSuggestion ? (suggestion ? suggestion.label : '') : 'Ninguna convenció', suggestion && suggestion.sil) +
+    row('Tipo de corte', haircut ? haircut.label : 'Sin elegir', haircut && haircut.sil) +
+    row('Flequillo', bangs ? bangs.label : 'Sin flequillo', bangs && bangs.sil) +
+    row('Largada de corte', s.lengthValue + '%') +
+    row('Reducción de volumen', s.volumeReduction ? 'Sí' : 'No');
+
+  return '<div class="hv-screen">' + screenHeader('Resumen de la Sesión', true) +
+    '<div style="flex:1;display:flex;flex-direction:column;gap:.75rem;overflow-y:auto;max-width:640px">' + body + '</div>' +
+    '<p style="margin-top:1.5rem;font-size:.875rem;color:var(--color-ink-muted)">Toca "atrás" para ajustar cualquier elección antes de generar el resultado.</p>' +
+    '<button id="editBack" style="align-self:flex-start;margin-top:.5rem;font-size:.875rem;color:var(--color-accent);background:none;border:none;text-decoration:underline">' +
+    (acceptedAiSuggestion ? '← Volver a sugerencias' : '← Editar ajustes de corte') + '</button>' +
+    '</div>';
+}
+
+function renderResultPreview() {
+  var ui = state.ui;
+  var stage;
+  var beforeImg = ui.resultData && ui.resultData.beforeImage;
+  var afterImg = ui.resultData && ui.resultData.afterImage;
+  if (ui.resultStatus === 'loading') {
+    stage = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;color:var(--color-ink-muted)">' +
+      '<div style="width:32px;height:32px;border-radius:50%;border:3px solid var(--color-line-soft);border-top-color:var(--color-accent);animation:hv-spin .9s linear infinite"></div>' +
+      '<p>Generando simulación…</p></div>';
+  } else if (ui.resultStatus === 'error') {
+    stage = '<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;color:var(--color-ink-muted)">' +
+      '<p style="max-width:420px">' + esc(ui.resultError || 'No se pudo generar el resultado.') + '</p>' +
+      '<button id="retryResult" class="hv-btn outline">Reintentar</button></div>';
+  } else if (!ui.compareExpanded) {
+    var beforeCard = beforeImg
+      ? '<button class="hv-card hv-photo-card" style="min-height:100%" data-expand="before"><div class="hv-card-media"><img src="' + beforeImg + '" alt="Antes"></div><span class="hv-card-label" style="font-size:1.1rem">Antes</span></button>'
+      : '<button class="hv-card" style="min-height:100%" data-expand="before"><div class="hv-card-media" style="width:140px">' + cardMedia('base') + '</div><span class="hv-card-label" style="font-size:1.1rem">Antes</span></button>';
+    var afterCard = afterImg
+      ? '<button class="hv-card hv-photo-card" style="min-height:100%" data-expand="after"><div class="hv-card-media"><img src="' + afterImg + '" alt="Después"></div><span class="hv-card-label" style="font-size:1.1rem">Después</span></button>'
+      : '<button class="hv-card" style="min-height:100%" data-expand="after"><div class="hv-card-media" style="width:140px">' + cardMedia(ui.resultData ? ui.resultData.afterSil : 'base') + '</div><span class="hv-card-label" style="font-size:1.1rem">Después</span></button>';
+    stage = '<div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:2rem;height:100%">' + beforeCard + afterCard + '</div>';
+  } else {
+    // Ya no hay comparación a medias (mitad antes / mitad después): la
+    // vista ampliada siempre muestra el estado inicial, y mientras se
+    // mantiene pulsado muestra el resultado final completo, sin mezcla.
+    var mainMedia;
+    if (beforeImg || afterImg) {
+      var src = ui.holding ? (afterImg || beforeImg) : (beforeImg || afterImg);
+      mainMedia = '<img src="' + src + '" style="max-width:100%;max-height:100%;object-fit:contain">';
+    } else {
+      var mainSil = ui.holding ? (ui.resultData ? ui.resultData.afterSil : 'base') : 'base';
+      mainMedia = '<div style="width:45%;height:60%">' + cardMedia(mainSil) + '</div>';
+    }
+    stage = '<div class="hv-overlay" style="background:rgba(28,26,23,.92)" id="resultOverlay">' +
+      '<div id="resultStage" style="position:relative;width:min(70vw,640px);height:min(70vh,520px);background:var(--color-surface);border-radius:var(--radius-md);overflow:hidden;display:flex;align-items:center;justify-content:center;touch-action:none">' +
+      mainMedia +
+      '<span style="position:absolute;bottom:16px;font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:' + (ui.holding ? 'var(--color-accent)' : 'var(--color-ink-muted)') + '">' +
+      (ui.holding ? 'Resultado final' : 'Mantén pulsado para ver el resultado final') + '</span>' +
+      '</div><button id="closeResultStage" style="position:absolute;top:24px;right:24px;width:44px;height:44px;border-radius:50%;border:1px solid var(--color-line);background:var(--color-surface-raised);font-size:1.5rem">×</button>' +
+      '</div>';
+  }
+  return '<div class="hv-screen">' + screenHeader('Resultado Final Aproximado', false) +
+    '<div style="flex:1;min-height:0">' + stage + '</div>' +
+    '<p style="margin-top:1.5rem;font-size:.875rem;color:var(--color-ink-muted);text-align:center">Toca una de las dos fotos para verla en grande y mantén pulsado para ver el resultado final.</p>' +
+    (ui.resultStatus === 'ready' ? '<p style="font-size:.875rem;text-align:center;color:var(--color-accent)">' + esc(ui.resultData.note) + '</p>' : '') +
+    '<p style="font-size:.75rem;text-align:center;color:var(--color-ink-faint)">Simulación orientativa — no sustituye el resultado real del corte.</p>' +
+    '</div>';
+}
+
+function renderSaveProfile() {
+  var ui = state.ui;
+  return '<div class="hv-screen" style="align-items:center;justify-content:center">' +
+    '<div style="display:flex;flex-direction:column;align-items:center;gap:1.5rem">' +
+    '<div style="display:flex;gap:2rem">' +
+    '<button class="hv-btn outline" id="newFromEnd">Nuevo +</button>' +
+    '<button class="hv-btn ' + (ui.saved ? 'primary' : 'outline') + '" id="saveProfileBtn"' + (ui.saved ? ' disabled' : '') + '>' + (ui.saved ? 'Perfil Guardado' : 'Guardar Perfil') + '</button>' +
+    '</div>' +
+    (ui.saved ? '<p style="font-size:.875rem;color:var(--color-ink-muted)">El perfil de la clienta quedó guardado para la próxima visita.</p>' : '') +
+    '</div></div>';
+}
+
+function renderCornerNav() {
+  var step = currentStep();
+  var isFirst = state.stepIndex === 0;
+  var isLast = state.stepIndex === getFlowSteps().length - 1;
+  var html = '';
+  if (step !== 'home') html += '<button class="hv-corner tl" id="cornerHome" aria-label="Inicio">' + ICONS.home + '</button>';
+  if (!isFirst) html += '<button class="hv-corner bl" id="cornerBack" aria-label="Atrás">' + ICONS.back + '</button>';
+  if (!isLast && step !== 'home') html += '<button class="hv-corner br" id="cornerNext" aria-label="Siguiente">' + ICONS.next + '</button>';
+  return html;
+}
+
+/* ---------- main render + event wiring ---------- */
+function render() {
+  var step = currentStep();
+  var html;
+  if (step === 'home') html = renderHome();
+  else if (step === 'clientProfile') html = renderClientProfile();
+  else if (step === 'suggestions') html = renderSuggestions();
+  else if (step === 'haircutTypes') html = renderHaircutTypes();
+  else if (step === 'cutAdjustments') html = renderCutAdjustments();
+  else if (step === 'summaryReview') html = renderSummaryReview();
+  else if (step === 'resultPreview') html = renderResultPreview();
+  else if (step === 'saveProfile') html = renderSaveProfile();
+
+  document.getElementById('root').innerHTML = '<div class="hv-shell">' + html + renderCornerNav() +
+    (state.ui.showCartPreview ? renderCartPreview() : '') + '</div>';
+  wireEvents(step);
+
+  if (step === 'resultPreview' && state.ui.resultStatus === 'loading' && !state.ui.resultTimer && !state.ui.resultRequestSent) {
+    if (state.profile.capturedPhoto) {
+      // Hay una foto real de la clienta: pedimos la simulación de verdad
+      // al servidor de Nano Banana (ver hairvision/server-README.md).
+      state.ui.resultRequestSent = true;
+      requestRealResult();
+    } else {
+      // Sin foto real todavía (p.ej. probando la app sin cámara): dejamos
+      // el dibujo de muestra como antes, para no romper la demo.
+      state.ui.resultTimer = setTimeout(function () {
+        var s = state.selections;
+        var acceptedAi = s.suggestion === 'x' || s.suggestion === 'y';
+        var suggestionOpt = SUGGESTION_OPTIONS.filter(function (o) { return o.id === s.suggestion; })[0];
+        state.ui.resultData = acceptedAi && suggestionOpt ? {
+          afterSil: suggestionOpt.sil,
+          note: 'Simulación generada para ' + (state.profile.name || 'la clienta') + ' según la sugerencia de IA "' + suggestionOpt.label + '" aplicada.'
+        } : {
+          afterSil: (s.haircutType || 'corte-recto') + '__' + (s.bangs || 'none'),
+          note: 'Simulación generada para ' + (state.profile.name || 'la clienta') + ' según el corte y ajustes seleccionados.'
+        };
+        state.ui.resultStatus = 'ready';
+        state.ui.resultTimer = null;
+        render();
+      }, 1400);
+    }
+  }
+}
+
+// Llama al servidor local (index.js / server-index.js) con la foto real de
+// la clienta y lo que eligió la estilista, y espera la imagen generada por
+// Nano Banana. Si el servidor no está encendido o la llamada falla,
+// mostramos un error claro con botón de reintentar (ver renderResultPreview).
+function requestRealResult() {
+  var p = state.profile, s = state.selections;
+  fetch(HAIRVISION_SERVER_URL + '/api/generar-resultado', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      photo: p.capturedPhoto,
+      haircutType: s.haircutType,
+      bangs: s.bangs,
+      lengthValue: s.lengthValue,
+      volumeReduction: s.volumeReduction
+    })
+  }).then(function (res) {
+    return res.json().then(function (data) { return { ok: res.ok, data: data }; });
+  }).then(function (result) {
+    if (!result.ok || !result.data || !result.data.image) {
+      state.ui.resultStatus = 'error';
+      state.ui.resultError = (result.data && result.data.error) || 'El servidor no devolvió ninguna imagen.';
+    } else {
+      state.ui.resultData = {
+        beforeImage: p.capturedPhoto,
+        afterImage: result.data.image,
+        note: 'Simulación generada con IA para ' + (p.name || 'la clienta') + '.'
+      };
+      state.ui.resultStatus = 'ready';
+    }
+    render();
+  }).catch(function () {
+    state.ui.resultStatus = 'error';
+    state.ui.resultError = 'No se pudo conectar con el servidor de HairVision. Comprueba que esté encendido en el ordenador (ventana negra con "npm start").';
+    render();
+  });
+}
+
+function clearResultTimer() {
+  if (state.ui.resultTimer) { clearTimeout(state.ui.resultTimer); state.ui.resultTimer = null; }
+  state.ui.resultStatus = 'loading';
+  state.ui.resultData = null;
+  state.ui.resultError = null;
+  state.ui.resultRequestSent = false;
+  state.ui.compareExpanded = null;
+  state.ui.holding = false;
+}
+function stopCameraStream() {
+  if (state.ui.cameraStream) {
+    state.ui.cameraStream.getTracks().forEach(function (t) { t.stop(); });
+    state.ui.cameraStream = null;
+  }
+  state.ui.cameraActive = false;
+}
+function startCamera() {
+  state.ui.cameraError = null;
+  if (!window.isSecureContext) {
+    state.ui.cameraError = 'Los navegadores solo permiten la cámara en páginas servidas por http/https (o localhost), no al abrir este archivo con doble clic. Funcionará cuando la app esté en la tablet o en un servidor.';
+    render();
+    return;
+  }
+  if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
+    state.ui.cameraError = 'Este navegador no permite acceder a la cámara aquí.';
+    render();
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(function (stream) {
+    state.ui.cameraStream = stream;
+    state.ui.cameraActive = true;
+    render();
+  }).catch(function (err) {
+    state.ui.cameraError = 'No se pudo acceder a la cámara (' + (err && err.name ? err.name : 'error') + '). Revisa los permisos de cámara del navegador o de la tablet.';
+    render();
+  });
+}
+function capturePhoto() {
+  var videoEl = document.getElementById('cameraVideo');
+  if (!videoEl || !videoEl.videoWidth) return;
+  var canvas = document.createElement('canvas');
+  canvas.width = videoEl.videoWidth;
+  canvas.height = videoEl.videoHeight;
+  var ctx = canvas.getContext('2d');
+  ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+  state.profile.capturedPhoto = canvas.toDataURL('image/jpeg', 0.85);
+  stopCameraStream();
+  render();
+}
+
+// Los sliders nativos (<input type="range">) solo mueven el valor si
+// arrastras el pulgar; tocar cualquier otro punto de la barra no hace
+// nada en algunos navegadores/tablets. Esto hace que tocar en cualquier
+// punto de la barra salte directamente a ese valor (y desde ahí ya se
+// puede seguir arrastrando con normalidad).
+function enableSliderTapToJump(root) {
+  root.querySelectorAll('input[type="range"]').forEach(function (input) {
+    input.addEventListener('pointerdown', function (e) {
+      var rect = input.getBoundingClientRect();
+      var ratio = rect.width > 0 ? (e.clientX - rect.left) / rect.width : 0;
+      ratio = Math.min(1, Math.max(0, ratio));
+      var min = parseFloat(input.min) || 0;
+      var max = parseFloat(input.max) || 100;
+      var step = parseFloat(input.step) || 1;
+      var raw = min + ratio * (max - min);
+      var stepped = Math.round(raw / step) * step;
+      if (String(stepped) !== input.value) {
+        input.value = String(stepped);
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  });
+}
+
+function wireEvents(step) {
+  var root = document.getElementById('root');
+  enableSliderTapToJump(root);
+
+  var cornerHome = document.getElementById('cornerHome'); if (cornerHome) cornerHome.onclick = goHome;
+  var cornerBack = document.getElementById('cornerBack'); if (cornerBack) cornerBack.onclick = goBack;
+  var cornerNext = document.getElementById('cornerNext'); if (cornerNext) cornerNext.onclick = goNext;
+
+  // Carrito: se puede abrir/cerrar desde cualquier pantalla que lo muestre.
+  var cartBadge = document.getElementById('cartBadge');
+  if (cartBadge) cartBadge.onclick = function () { state.ui.showCartPreview = true; render(); };
+  var cartOverlay = document.getElementById('cartPreviewOverlay');
+  if (cartOverlay) {
+    cartOverlay.onclick = function (e) { if (e.target === cartOverlay) { state.ui.showCartPreview = false; render(); } };
+    var closeCartBtn = document.getElementById('closeCartPreview');
+    if (closeCartBtn) closeCartBtn.onclick = function () { state.ui.showCartPreview = false; render(); };
+    root.querySelectorAll('[data-remove-cart-item]').forEach(function (btn) {
+      btn.onclick = function () {
+        var key = btn.getAttribute('data-remove-cart-item');
+        if (key === 'suggestion') {
+          state.selections.suggestion = null;
+          state.selections.haircutType = null;
+          state.selections.bangs = null;
+          state.selections.lengthValue = 60;
+          state.selections.volumeReduction = false;
+        } else if (key === 'haircutType') {
+          state.selections.haircutType = null;
+        } else if (key === 'bangs') {
+          state.selections.bangs = null;
+        } else if (key === 'length') {
+          state.selections.lengthValue = 60;
+        } else if (key === 'volumeReduction') {
+          state.selections.volumeReduction = false;
+        }
+        render();
+      };
+    });
+  }
+
+  if (step === 'home') {
+    document.getElementById('newClientBtn').onclick = function () {
+      state.profile = emptyProfile();
+      state.selections = JSON.parse(JSON.stringify(emptySelections));
+      goNext();
+    };
+    document.getElementById('loadProfileBtn').onclick = function () {
+      state.ui.savedProfiles = loadSavedProfiles();
+      state.ui.picking = true;
+      render();
+    };
+    var overlay = document.getElementById('homeOverlay');
+    if (overlay) {
+      overlay.onclick = function (e) { if (e.target === overlay) { state.ui.picking = false; render(); } };
+      document.getElementById('closePicker').onclick = function () { state.ui.picking = false; render(); };
+      root.querySelectorAll('[data-load-profile]').forEach(function (btn) {
+        btn.onclick = function () {
+          var idx = Number(btn.getAttribute('data-load-profile'));
+          var loaded = state.ui.savedProfiles[idx];
+          state.profile = Object.assign(emptyProfile(), loaded);
+          state.selections = JSON.parse(JSON.stringify(emptySelections));
+          state.ui.picking = false;
+          goNext();
+        };
+      });
+    }
+  }
+
+  if (step === 'clientProfile') {
+    var recordBtn = document.getElementById('recordBtn');
+    if (recordBtn) recordBtn.onclick = function () { startCamera(); };
+    var cancelCameraBtn = document.getElementById('cancelCameraBtn');
+    if (cancelCameraBtn) cancelCameraBtn.onclick = function () { stopCameraStream(); render(); };
+    var captureCameraBtn = document.getElementById('captureCameraBtn');
+    if (captureCameraBtn) captureCameraBtn.onclick = function () { capturePhoto(); };
+    var cameraVideoEl = document.getElementById('cameraVideo');
+    if (cameraVideoEl && state.ui.cameraStream) cameraVideoEl.srcObject = state.ui.cameraStream;
+    document.getElementById('nameInput').oninput = function (e) { state.profile.name = e.target.value; };
+
+    root.querySelectorAll('[data-toggle="ageRange"]').forEach(function (btn) {
+      btn.onclick = function () {
+        state.profile.ageRange = btn.getAttribute('data-toggle-id');
+        render();
+      };
+    });
+
+    // No llamamos a render() en cada input de estos sliders: al ser
+    // continuos disparan muchos eventos al arrastrar, y re-pintar todo el
+    // HTML en cada uno rompe el arrastre. En vez de eso: aplicamos el
+    // "imán" (si se acerca a una etiqueta, se pega) y actualizamos solo
+    // las etiquetas de este slider directamente en el DOM, sin re-render.
+    root.querySelectorAll('[data-stepped-slider]').forEach(function (input) {
+      input.oninput = function () {
+        var id = input.getAttribute('data-stepped-slider');
+        var n = Number(input.getAttribute('data-ticks'));
+        var raw = Number(input.value);
+
+        var nearestIndex = Math.round((raw / 100) * (n - 1));
+        var nearestValue = (nearestIndex / (n - 1)) * 100;
+        var v = Math.abs(raw - nearestValue) <= SLIDER_SNAP_THRESHOLD ? nearestValue : raw;
+        if (v !== raw) input.value = v;
+
+        var p = state.profile;
+        if (id === 'hairType') p.hairStructure.type = v;
+        else if (id === 'thickness') p.hairStructure.thickness = v;
+        else if (id === 'density') p.hairStructure.density = v;
+        else if (id === 'volume') p.behavior.naturalVolume = v;
+        else if (id === 'elasticity') p.behavior.elasticity = v;
+
+        var activeIndex = Math.round((v / 100) * (n - 1));
+        var ticksEl = document.getElementById('ticks-' + id);
+        if (ticksEl) {
+          ticksEl.querySelectorAll('.hv-tick-abs').forEach(function (tick, i) {
+            tick.classList.toggle('active', i === activeIndex);
+          });
+        }
+      };
+    });
+    root.querySelectorAll('[data-continuous-slider]').forEach(function (input) {
+      input.oninput = function () {
+        if (input.getAttribute('data-continuous-slider') === 'damage') {
+          state.profile.condition.damageLevel = Number(input.value);
+          updateContinuousTickHighlight('damage', input.value);
+        }
+      };
+    });
+    root.querySelectorAll('[data-toggle="condition"]').forEach(function (btn) {
+      btn.onclick = function () {
+        var id = btn.getAttribute('data-toggle-id');
+        state.profile.condition[id] = !state.profile.condition[id];
+        render();
+      };
+    });
+    root.querySelectorAll('[data-toggle="growth"]').forEach(function (btn) {
+      btn.onclick = function () {
+        state.profile.growthDirection = btn.getAttribute('data-toggle-id');
+        render();
+      };
+    });
+    document.getElementById('growthHelpBtn').onclick = function () { state.ui.showGrowthHelp = true; render(); };
+    var ghOverlay = document.getElementById('growthHelpOverlay');
+    if (ghOverlay) {
+      ghOverlay.onclick = function (e) { if (e.target === ghOverlay) { state.ui.showGrowthHelp = false; render(); } };
+      document.getElementById('closeGrowthHelp').onclick = function () { state.ui.showGrowthHelp = false; render(); };
+    }
+
+    // "Tiene remolino" es independiente de Frontal/Lateral/Mixto — se
+    // puede combinar con cualquiera de ellas.
+    var whorlToggleBtn = document.getElementById('whorlToggleBtn');
+    if (whorlToggleBtn) {
+      whorlToggleBtn.onclick = function () {
+        state.profile.hasWhorl = !state.profile.hasWhorl;
+        if (state.profile.hasWhorl) state.ui.showWhorlPicker = true;
+        render();
+      };
+    }
+    var reopenWhorl = document.getElementById('reopenWhorlPicker');
+    if (reopenWhorl) reopenWhorl.onclick = function () { state.ui.showWhorlPicker = true; render(); };
+
+    var whorlOverlay = document.getElementById('whorlPickerOverlay');
+    if (whorlOverlay) {
+      whorlOverlay.onclick = function (e) { if (e.target === whorlOverlay) { state.ui.showWhorlPicker = false; render(); } };
+      // Un toque fuera de la silueta real de la cabeza (esquinas vacías
+      // del lienzo) se ignora — no tiene sentido marcar un remolino ahí.
+      // Dentro de la silueta, el punto se guarda como una posición
+      // vertical canónica (y, espacio de la vista de atrás) más una
+      // proporción horizontal (r, -1 a 1 respecto al borde de la cabeza
+      // EN ESA ALTURA), así al dibujarlo en la otra vista se usa la
+      // anchura real de esa vista y nunca queda fuera de su silueta.
+      var handleWhorlCanvasClick = function (canvasEl, e) {
+        var rect = canvasEl.getBoundingClientRect();
+        var rawX = ((e.clientX - rect.left) / rect.width) * 100;
+        var rawY = ((e.clientY - rect.top) / rect.height) * 100;
+        var isTop = canvasEl.id === 'whorlCanvasTop';
+        var px = rawX * 3, py = rawY * 3;
+        var newPos = null;
+        if (isTop) {
+          var n = ovalNormFromClick(px, py);
+          if (n.radial > 1) return; // fuera del óvalo, se ignora el toque
+          newPos = { zone: 'crown', nx: Math.round(n.nx * 100) / 100, ny: Math.round(n.ny * 100) / 100 };
+        } else {
+          var hw = backHalfWidthAtY(py);
+          if (hw <= 0 || Math.abs(px - WHORL_BACK_CX) > hw) return; // fuera de la silueta, se ignora el toque
+          if (rawY <= WHORL_CROWN_ZONE_MAX_Y) {
+            // Dentro de la franja visible desde arriba: se traduce a
+            // coordenadas del óvalo. Esta vista no distingue si el punto
+            // está más hacia delante o hacia atrás del vértice, así que
+            // se asume el lado de atrás (hacia la nuca) — la lectura más
+            // plausible al marcar un punto desde la vista de atrás.
+            var radial = Math.max(0, Math.min(1, (py - WHORL_CROWN_APEX_VB) / (WHORL_CROWN_EDGE_VB - WHORL_CROWN_APEX_VB)));
+            var sideR = (px - WHORL_BACK_CX) / hw;
+            var nx = sideR * radial;
+            var ny = Math.sqrt(Math.max(0, radial * radial - nx * nx));
+            newPos = { zone: 'crown', nx: Math.round(nx * 100) / 100, ny: Math.round(ny * 100) / 100 };
+          } else {
+            var r = (px - WHORL_BACK_CX) / hw;
+            newPos = { zone: 'nape', y: Math.round(rawY * 10) / 10, r: Math.round(r * 100) / 100 };
+          }
+        }
+        var positions = state.profile.growthWhorlPositions;
+        var removeRadius = 6; // % del lienzo de esta vista
+        var hitIndex = -1;
+        for (var i = 0; i < positions.length; i++) {
+          if (isTop && positions[i].zone !== 'crown') continue; // no visible en esta vista
+          var onScreen = isTop ? whorlPointForTopView(positions[i]) : whorlPointForBackView(positions[i]);
+          if (!onScreen) continue;
+          var dx = onScreen.x - rawX, dy = onScreen.y - rawY;
+          if (Math.sqrt(dx * dx + dy * dy) <= removeRadius) { hitIndex = i; break; }
+        }
+        if (hitIndex >= 0) {
+          positions.splice(hitIndex, 1);
+        } else {
+          positions.push(newPos);
+        }
+        render();
+      };
+      var whorlCanvasTop = document.getElementById('whorlCanvasTop');
+      if (whorlCanvasTop) whorlCanvasTop.onclick = function (e) { handleWhorlCanvasClick(whorlCanvasTop, e); };
+      var whorlCanvasBack = document.getElementById('whorlCanvasBack');
+      if (whorlCanvasBack) whorlCanvasBack.onclick = function (e) { handleWhorlCanvasClick(whorlCanvasBack, e); };
+      var clearWhorls = document.getElementById('clearWhorlPositions');
+      if (clearWhorls) clearWhorls.onclick = function () { state.profile.growthWhorlPositions = []; render(); };
+      var confirmWhorl = document.getElementById('confirmWhorlPicker');
+      if (confirmWhorl) confirmWhorl.onclick = function () { state.ui.showWhorlPicker = false; render(); };
+    }
+  }
+
+  if (step === 'suggestions') {
+    root.querySelectorAll('[data-suggestion]').forEach(function (btn) {
+      btn.onclick = function () {
+        var id = btn.getAttribute('data-suggestion');
+        state.selections.suggestion = id;
+        var opt = SUGGESTION_OPTIONS.filter(function (o) { return o.id === id; })[0];
+        if (opt) {
+          // Se aceptó una sugerencia de IA: rellenamos solos los mismos
+          // campos que se elegirían a mano en las pantallas que nos
+          // saltamos, para que el resumen final se vea completo.
+          state.selections.haircutType = opt.haircutType;
+          state.selections.bangs = opt.bangs;
+          state.selections.lengthValue = opt.lengthValue;
+          state.selections.volumeReduction = opt.volumeReduction;
+        } else {
+          // "Ninguna me convence": empezamos limpio para la elección manual.
+          state.selections.haircutType = null;
+          state.selections.bangs = null;
+          state.selections.lengthValue = 60;
+          state.selections.volumeReduction = false;
+        }
+        render();
+      };
+    });
+  }
+
+  if (step === 'haircutTypes') {
+    root.querySelectorAll('[data-haircut]').forEach(function (btn) {
+      btn.onclick = function () { state.selections.haircutType = btn.getAttribute('data-haircut'); render(); };
+    });
+  }
+
+  if (step === 'cutAdjustments') {
+    if (state.ui.subview === 'none') {
+      document.getElementById('openBangs').onclick = function () { state.ui.subview = 'bangs'; render(); };
+      document.getElementById('openLength').onclick = function () { state.ui.subview = 'length'; render(); };
+      document.getElementById('toggleVolume').onclick = function () { state.selections.volumeReduction = !state.selections.volumeReduction; render(); };
+    }
+    if (state.ui.subview === 'bangs') {
+      root.querySelectorAll('[data-bangs]').forEach(function (btn) {
+        btn.onclick = function () { state.selections.bangs = btn.getAttribute('data-bangs'); render(); };
+      });
+    }
+    if (state.ui.subview === 'length') {
+      var lengthInput = root.querySelector('[data-continuous-slider="length"]');
+      if (lengthInput) lengthInput.oninput = function () {
+        state.selections.lengthValue = Number(lengthInput.value);
+        var windowEl = document.getElementById('hairPhotoWindow');
+        if (windowEl) {
+          var visiblePercent = hairPhotoWindowPercent(lengthInput.value);
+          windowEl.style.height = visiblePercent.toFixed(1) + '%';
+          var innerImg = windowEl.querySelector('img');
+          if (innerImg) innerImg.style.height = (10000 / visiblePercent).toFixed(1) + '%';
+        }
+        updateContinuousTickHighlight('length', lengthInput.value);
+      };
+    }
+  }
+
+  if (step === 'summaryReview') {
+    document.getElementById('editBack').onclick = goBack;
+  }
+
+  if (step === 'resultPreview') {
+    var expandBtns = root.querySelectorAll('[data-expand]');
+    expandBtns.forEach(function (btn) {
+      btn.onclick = function () { state.ui.compareExpanded = btn.getAttribute('data-expand'); render(); };
+    });
+    var resultOverlay = document.getElementById('resultOverlay');
+    var resultStage = document.getElementById('resultStage');
+    if (resultOverlay) {
+      resultOverlay.onclick = function () { if (!state.ui.holding) { state.ui.compareExpanded = null; render(); } };
+    }
+    if (resultStage) {
+      resultStage.onclick = function (e) { e.stopPropagation(); };
+      resultStage.onpointerdown = function () { state.ui.holding = true; render(); };
+      resultStage.onpointerup = function () { state.ui.holding = false; render(); };
+      resultStage.onpointerleave = function () { state.ui.holding = false; render(); };
+    }
+    var closeBtn = document.getElementById('closeResultStage');
+    if (closeBtn) closeBtn.onclick = function () { state.ui.compareExpanded = null; render(); };
+    var retryBtn = document.getElementById('retryResult');
+    if (retryBtn) retryBtn.onclick = function () {
+      state.ui.resultStatus = 'loading';
+      state.ui.resultError = null;
+      state.ui.resultRequestSent = false;
+      render();
+    };
+  }
+
+  if (step === 'saveProfile') {
+    document.getElementById('newFromEnd').onclick = function () {
+      state.profile = emptyProfile();
+      state.selections = JSON.parse(JSON.stringify(emptySelections));
+      state.ui.saved = false;
+      goHome();
+    };
+    document.getElementById('saveProfileBtn').onclick = function () {
+      var list = loadSavedProfiles();
+      list.unshift(state.profile);
+      persistProfiles(list);
+      state.ui.saved = true;
+      render();
+    };
+  }
+}
+
+render();
+</script>
+</body>
+</html>
