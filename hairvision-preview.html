@@ -166,10 +166,29 @@
   .hv-cart-row-label { font-size:.9375rem; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .hv-cart-row-remove { flex:none; width:28px; height:28px; border-radius:50%; border:1px solid var(--color-line); background: var(--color-surface); color: var(--color-reject); font-size:1.125rem; line-height:1; display:flex; align-items:center; justify-content:center; }
   .hv-cart-row-remove:hover { border-color: var(--color-reject); background: var(--color-reject-soft); }
+
+  /* HairVision está pensado solo para uso horizontal (tablet en mostrador
+     de peluquería). En móvil/tablet en vertical no se puede navegar bien
+     -- en vez de dejar que se use mal, se bloquea con un aviso a girar el
+     dispositivo. No existe una forma fiable de FORZAR el giro real desde
+     una página web normal en todos los navegadores (eso solo se puede
+     garantizar del todo con una app nativa de verdad) -- este aviso es lo
+     más parecido que se puede hacer sin salir de la web. */
+  .hv-rotate-overlay { display:none; position:fixed; inset:0; z-index:9999; background: var(--color-bg); color: var(--color-ink); flex-direction:column; align-items:center; justify-content:center; text-align:center; padding: var(--space-6); gap: var(--space-4); }
+  .hv-rotate-overlay svg { width:64px; height:64px; }
+  @media (orientation: portrait) and (max-width: 1024px) {
+    .hv-rotate-overlay { display:flex; }
+    .hv-shell, #root > *:not(.hv-rotate-overlay) { visibility:hidden; }
+  }
 </style>
 </head>
 <body>
 <div class="hv-banner">Vista previa estática (sin frameworks, funciona sin internet) — el proyecto real vive en el repo Vite + React + TS.</div>
+<div class="hv-rotate-overlay">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M2 8v8M22 8v8" stroke-dasharray="2 2"/></svg>
+  <div style="font-size:1.125rem;font-weight:600">Gira tu dispositivo</div>
+  <div style="font-size:.9375rem;color:var(--color-ink-muted);max-width:280px">HairVision está pensado para usarse en horizontal, apoyada en el mostrador.</div>
+</div>
 <div id="root"></div>
 <script>
 'use strict';
@@ -408,6 +427,15 @@ function esc(s) {
 function currentStep() { return getFlowSteps()[state.stepIndex]; }
 function goNext() {
   if (currentStep() === 'resultPreview' && state.ui.resultStatus !== 'ready') return;
+  // Si estamos dentro de Flequillo o Largada (subview de "Ajustes de
+  // Corte"), la flecha de siguiente primero nos devuelve al menú de los
+  // 3 botones (Flequillo / Largada / Volumen) por si se quiere elegir
+  // algo más, en vez de saltar directo al resumen.
+  if (currentStep() === 'cutAdjustments' && state.ui.subview !== 'none') {
+    state.ui.subview = 'none';
+    render();
+    return;
+  }
   state.stepIndex = Math.min(state.stepIndex + 1, getFlowSteps().length - 1);
   onStepChange();
   render();
@@ -953,10 +981,13 @@ function renderCornerNav() {
   var step = currentStep();
   var isFirst = state.stepIndex === 0;
   var isLast = state.stepIndex === getFlowSteps().length - 1;
+  // En "Sugerencias" no se puede avanzar hasta elegir Opción X, Opción Y
+  // o "Ninguna me convence" -- si no, no tiene sentido pasar de pantalla.
+  var blockedOnSuggestions = step === 'suggestions' && !state.selections.suggestion;
   var html = '';
   if (step !== 'home') html += '<button class="hv-corner tl" id="cornerHome" aria-label="Inicio">' + ICONS.home + '</button>';
   if (!isFirst) html += '<button class="hv-corner bl" id="cornerBack" aria-label="Atrás">' + ICONS.back + '</button>';
-  if (!isLast && step !== 'home') html += '<button class="hv-corner br" id="cornerNext" aria-label="Siguiente">' + ICONS.next + '</button>';
+  if (!isLast && step !== 'home' && !blockedOnSuggestions) html += '<button class="hv-corner br" id="cornerNext" aria-label="Siguiente">' + ICONS.next + '</button>';
   return html;
 }
 
