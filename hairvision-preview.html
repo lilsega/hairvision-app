@@ -1446,7 +1446,13 @@ function wireEvents(step) {
     }
     if (state.ui.subview === 'bangs') {
       root.querySelectorAll('[data-bangs]').forEach(function (btn) {
-        btn.onclick = function () { state.selections.bangs = btn.getAttribute('data-bangs'); render(); };
+        btn.onclick = function () {
+          var id = btn.getAttribute('data-bangs');
+          // Tocar el flequillo ya seleccionado lo quita (vuelve a null) --
+          // por si se eligió sin querer y se prefiere no llevar flequillo.
+          state.selections.bangs = (state.selections.bangs === id) ? null : id;
+          render();
+        };
       });
     }
     if (state.ui.subview === 'length') {
