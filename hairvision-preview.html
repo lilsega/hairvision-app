@@ -38,6 +38,12 @@
   }
   * { box-sizing: border-box; }
   html, body, #root { height: 100%; margin: 0; }
+  /* touch-action: pan-x pan-y (en vez de "manipulation") deja mover el
+     dedo pero excluye explícitamente el pellizco para zoom y el
+     doble-toque-para-zoom -- esto sí lo respetan la mayoría de móviles,
+     a diferencia de "user-scalable=no" en el viewport, que iOS/Android
+     ignoran a propósito desde hace años por accesibilidad. */
+  html, body { touch-action: pan-x pan-y; }
   body { font-family: var(--font-family); background: var(--color-bg); color: var(--color-ink); overflow: hidden; user-select: none; -webkit-font-smoothing: antialiased; }
   button { font-family: inherit; cursor: pointer; }
   input { font-family: inherit; }
@@ -192,6 +198,23 @@
 <div id="root"></div>
 <script>
 'use strict';
+
+// Bloqueo extra contra el zoom en móvil. El "touch-action: pan-x pan-y"
+// del CSS ya frena el pellizco en la mayoría de Android/Chrome, pero
+// Safari de iPhone/iPad tiene su propio gesto de pellizco ("gesturestart"
+// etc.) que no siempre respeta el CSS -- lo bloqueamos aparte. También
+// evitamos el zoom por "doble toque rápido" a mano, por si el navegador
+// no lo respetara solo con touch-action.
+document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function (e) { e.preventDefault(); });
+(function () {
+  var lastTouchEnd = 0;
+  document.addEventListener('touchend', function (e) {
+    var now = Date.now();
+    if (now - lastTouchEnd <= 300) e.preventDefault();
+    lastTouchEnd = now;
+  }, { passive: false });
+})();
 
 /* ---------- servidor de IA (Nano Banana) ---------- */
 // Cuando el servidor local (ver hairvision/server-README.md) esté
