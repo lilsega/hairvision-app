@@ -179,6 +179,12 @@
 // corriendo en el ordenador del salón, la app le habla a esta dirección.
 // Si algún día se sube a un hosting real, solo hay que cambiar esta URL.
 var HAIRVISION_SERVER_URL = 'https://hairvision-server.onrender.com';
+// Tiene que ser EXACTAMENTE el mismo texto que APP_SHARED_SECRET en el
+// servidor (variable de entorno en Render). Sirve solo para que alguien
+// que se tropiece con la URL del servidor sin pasar por esta app no
+// pueda usarla — no es una seguridad fuerte (se puede ver en el código
+// fuente de esta página), pero evita el abuso casual.
+var HAIRVISION_APP_SECRET = '80139c092ea35e3117b4e9e0bdb83a937a8a46c1';
 
 /* ---------- data ---------- */
 var HAIRCUT_TYPES = [
@@ -1007,7 +1013,7 @@ function requestRealResult() {
   var p = state.profile, s = state.selections;
   fetch(HAIRVISION_SERVER_URL + '/api/generar-resultado', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-App-Secret': HAIRVISION_APP_SECRET },
     body: JSON.stringify({
       photo: p.capturedPhoto,
       haircutType: s.haircutType,
