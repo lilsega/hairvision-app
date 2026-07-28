@@ -1073,7 +1073,16 @@ function requestRealResult() {
       haircutType: s.haircutType,
       bangs: s.bangs,
       lengthValue: s.lengthValue,
-      volumeReduction: s.volumeReduction
+      volumeReduction: s.volumeReduction,
+      // Ficha de cabello completa (pantalla "Perfil de clienta"): antes
+      // se recogía pero nunca se mandaba al servidor, así que no influía
+      // en nada de la simulación. Ahora sí se manda, para que la IA tenga
+      // en cuenta cómo es de verdad el cabello de la clienta.
+      hairStructure: p.hairStructure,
+      behavior: p.behavior,
+      condition: p.condition,
+      growthDirection: p.growthDirection,
+      hasWhorl: p.hasWhorl
     })
   }).then(function (res) {
     return res.json().then(function (data) { return { ok: res.ok, data: data }; });
