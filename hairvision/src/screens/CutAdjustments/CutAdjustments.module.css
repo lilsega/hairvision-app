@@ -1,0 +1,77 @@
+.screen {
+  padding: var(--screen-padding-y) var(--screen-padding-x);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.subscreen {
+  composes: screen;
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: var(--space-6);
+  align-content: start;
+  max-width: 720px;
+}
+
+.tile {
+  position: relative;
+  padding: var(--space-6);
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border-thin);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: var(--text-md);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+
+.tileWide {
+  grid-column: 1 / -1;
+}
+
+.tileActive {
+  border-color: var(--color-selected);
+  background: var(--color-selected-soft);
+  color: var(--color-selected);
+}
+
+.tileTag {
+  position: absolute;
+  bottom: var(--space-3);
+  right: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-selected);
+  text-transform: capitalize;
+}
+
+.bangsGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-6);
+  align-content: start;
+}
+
+.lengthLayout {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+}
+
+.lengthPreview {
+  width: 160px;
+  height: 260px;
+}

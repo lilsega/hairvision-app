@@ -1,0 +1,51 @@
+.screen {
+}
+
+.stage {
+  flex: 1;
+  min-height: 0;
+}
+
+.loading {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  color: var(--color-ink-muted);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 3px solid var(--color-line-soft);
+  border-top-color: var(--color-accent);
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.caption {
+  margin-top: var(--space-5);
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  text-align: center;
+}
+
+.note {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--color-accent);
+}
+
+.disclaimer {
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  text-align: center;
+  color: var(--color-ink-faint);
+}

@@ -1,0 +1,90 @@
+.screen {
+  align-items: center;
+  justify-content: center;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: var(--text-3xl);
+  font-weight: 400;
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+}
+
+.camera {
+  width: 44px;
+  height: 36px;
+  margin: 0 var(--space-1);
+  color: var(--color-ink);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 26, 23, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 90;
+}
+
+.sheet {
+  width: min(480px, 80vw);
+  max-height: 70vh;
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-lg);
+}
+
+.sheetTitle {
+  font-size: var(--text-lg);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.empty {
+  color: var(--color-ink-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow-y: auto;
+  max-height: 40vh;
+}
+
+.profileItem {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-soft);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.profileName {
+  font-size: var(--text-base);
+}
+
+.profileMeta {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}

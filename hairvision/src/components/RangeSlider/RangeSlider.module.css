@@ -1,0 +1,88 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.block.vertical {
+  width: auto;
+  align-items: center;
+  height: 100%;
+}
+
+.label {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+
+.trackWrap {
+  width: 100%;
+  padding: var(--space-1) 0;
+}
+
+.trackWrapVertical {
+  height: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+}
+
+.input {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--color-line);
+  outline: none;
+}
+
+.input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  border: 2px solid var(--color-ink);
+  cursor: pointer;
+}
+
+.input::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--color-surface-raised);
+  border: 2px solid var(--color-ink);
+  cursor: pointer;
+}
+
+.inputVertical {
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 2px;
+  height: 220px;
+}
+
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.tick {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.tickActive {
+  composes: tick;
+  color: var(--color-ink);
+  font-weight: 500;
+}

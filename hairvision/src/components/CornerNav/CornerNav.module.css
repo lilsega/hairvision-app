@@ -1,0 +1,49 @@
+.zone {
+  position: fixed;
+  width: var(--nav-zone-size);
+  height: var(--nav-zone-size);
+  display: flex;
+  background: transparent;
+  border: none;
+  z-index: 40;
+  transition: background var(--duration-fast) var(--ease-standard);
+}
+
+.zone:active {
+  background: rgba(28, 26, 23, 0.06);
+}
+
+.topLeft {
+  top: 0;
+  left: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-radius: 0 0 var(--radius-lg) 0;
+}
+
+.bottomLeft {
+  bottom: 0;
+  left: 0;
+  align-items: flex-end;
+  justify-content: flex-start;
+  border-radius: 0 var(--radius-lg) 0 0;
+}
+
+.bottomRight {
+  bottom: 0;
+  right: 0;
+  align-items: flex-end;
+  justify-content: flex-end;
+  border-radius: var(--radius-lg) 0 0 0;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  margin: var(--space-4);
+  color: var(--color-ink-faint);
+}
+
+.zone:hover .icon {
+  color: var(--color-ink);
+}

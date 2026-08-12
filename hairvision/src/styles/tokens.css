@@ -1,0 +1,84 @@
+/*
+  HairVision — Design Tokens
+  Single source of truth for color, type, spacing and motion.
+  Keep component CSS free of raw values — always reference a token.
+*/
+:root {
+  /* ---- Color: surfaces ---- */
+  --color-bg: #f3efe8;
+  --color-surface: #eae2d6;
+  --color-surface-raised: #f7f4ee;
+  --color-surface-sunken: #e3d9c9;
+
+  /* ---- Color: text & lines ---- */
+  --color-ink: #1c1a17;
+  --color-ink-muted: #6f6a60;
+  --color-ink-faint: #a49c8d;
+  --color-line: #1c1a17;
+  --color-line-soft: rgba(28, 26, 23, 0.16);
+
+  /* ---- Color: brand & state ---- */
+  --color-accent: #8a5a44;
+  --color-accent-soft: #e9dccf;
+  --color-selected: #a63b32;
+  --color-selected-soft: rgba(166, 59, 50, 0.08);
+  --color-success: #52734d;
+  --color-focus: #8a5a44;
+
+  /* ---- Typography ---- */
+  --font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.375rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.25rem;
+  --text-3xl: 3rem;
+
+  --tracking-wide: 0.08em;
+  --tracking-wider: 0.18em;
+  --tracking-widest: 0.32em;
+
+  --leading-tight: 1.1;
+  --leading-normal: 1.5;
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+
+  /* ---- Shape ---- */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  --border-thin: 1px solid var(--color-line);
+  --border-soft: 1px solid var(--color-line-soft);
+  --border-dashed: 1px dashed var(--color-line);
+
+  /* ---- Elevation ---- */
+  --shadow-sm: 0 1px 2px rgba(28, 26, 23, 0.06);
+  --shadow-md: 0 8px 24px rgba(28, 26, 23, 0.10);
+  --shadow-lg: 0 20px 48px rgba(28, 26, 23, 0.16);
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --duration-slow: 420ms;
+
+  /* ---- Layout ---- */
+  --nav-zone-size: 96px;
+  --screen-padding-x: var(--space-7);
+  --screen-padding-y: var(--space-6);
+  --header-height: 64px;
+}

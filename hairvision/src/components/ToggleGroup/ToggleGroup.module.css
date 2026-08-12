@@ -1,0 +1,27 @@
+.grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.option,
+.optionActive {
+  padding: var(--space-4) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  border: var(--border-thin);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.optionActive {
+  background: var(--color-ink);
+  color: var(--color-surface-raised);
+}
+
+.option:active,
+.optionActive:active {
+  transform: scale(0.97);
+}
