@@ -672,7 +672,7 @@ function renderClientProfile() {
   if (p.condition.decolorado) conditionActive.push('decolorado');
 
   return '<div class="hv-screen">' +
-    '<div style="flex:1;display:grid;grid-template-columns:300px 1fr;gap:3rem;min-height:0">' +
+    '<div style="flex:1;display:grid;grid-template-columns:300px 1fr;grid-template-rows:minmax(0,1fr);gap:3rem;min-height:0">' +
     '<div style="display:flex;flex-direction:column;gap:1.5rem;overflow-y:auto;padding-bottom:1rem">' +
     recordArea +
     // Aviso de privacidad: la foto viaja a un servicio de IA externo
@@ -863,7 +863,7 @@ function renderSuggestions() {
   }).join('');
   var noneActive = s.suggestion === 'none';
   return '<div class="hv-screen">' + screenHeader('Sugerencias Según el Tipo de Cabello', true) +
-    '<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem">' +
+    '<div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2.5rem;padding-bottom:1rem">' +
     '<div class="hv-grid hv-grid-2" style="width:100%;max-width:760px;flex:none">' + cards + '</div>' +
     '<button class="hv-reject-btn' + (noneActive ? ' active' : '') + '" data-suggestion="none">' +
       '<span class="hv-reject-x">&times;</span><span>Ninguna me convence</span>' +

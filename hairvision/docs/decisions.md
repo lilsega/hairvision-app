@@ -1,5 +1,18 @@
 # Registro de decisiones
 
+**2026-07-23 — Segundo intento del arreglo de scroll.** El primer
+arreglo (activar `overflow-y:auto` en `.hv-screen`) no resolvió el
+problema para Sega probando en la tablet real, incluso en incógnito
+(descartando caché). Causa más probable: un problema clásico de CSS
+Grid/Flexbox — sin un límite de altura explícito en la fila del grid
+(pantalla de ficha de clienta) y sin `min-height:0` en el contenedor
+flex de Sugerencias, el contenido puede "reventar" hacia afuera del
+contenedor en vez de quedarse dentro y activar el scroll interno. Se
+añadió `grid-template-rows:minmax(0,1fr)` a la pantalla de ficha de
+clienta y `min-height:0` al contenedor de Sugerencias, forzando a
+ambas pantallas a respetar el límite de altura disponible y a que el
+scroll interno funcione de verdad.
+
 **2026-07-23 — Arreglo de scroll: contenido cortado en pantallas de
 Sugerencias y de rango de edad.** Probando en la tablet real de la
 peluquería 4, Sega detectó que en "Sugerencias Según el Tipo de
