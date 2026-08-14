@@ -7,9 +7,9 @@
 ## La primera vez que se abre la tablet
 
 1. Abre el navegador y ve a: `https://lilsega.github.io/hairvision-app/hairvision-preview.html`
-2. Te pedirá un **código de acceso** — es el que te ha dado tu contacto
-   de HairVision. Solo hace falta escribirlo una vez; la tablet lo
-   recuerda a partir de ahí.
+2. Te pedirá un **código de acceso**: `hairvision2026`. Solo hace falta
+   escribirlo una vez; la tablet lo recuerda a partir de ahí (no hay que
+   volver a escribirlo cada vez que se abra la app).
 3. Añade la página a la pantalla de inicio (en el menú del navegador,
    "Añadir a pantalla de inicio") para tener un icono directo, como si
    fuera una app normal.

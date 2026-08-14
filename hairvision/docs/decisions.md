@@ -1,5 +1,21 @@
 # Registro de decisiones
 
+**2026-07-23 — Arreglo de scroll: contenido cortado en pantallas de
+Sugerencias y de rango de edad.** Probando en la tablet real de la
+peluquería 4, Sega detectó que en "Sugerencias Según el Tipo de
+Cabello" no se veía el botón "Ninguna me convence" (se salía de la
+pantalla) y en el rango de edad no se podía deslizar para ver todas
+las opciones. Causa: esas pantallas no tenían scroll activado, así que
+si el contenido no cabía entero en la resolución/proporción concreta
+de esa tablet, quedaba cortado sin ninguna forma de acceder a él —
+podía incluso bloquear a alguien que no lograra elegir "ninguna me
+convence" y por tanto no pudiera avanzar. Arreglado de forma general:
+se activó scroll vertical en el contenedor base de todas las pantallas
+(`.hv-screen`), más un scroll específico en la columna de la ficha de
+clienta (nombre + rango de edad). Cuando el contenido cabe, no cambia
+nada visualmente; cuando no cabe, ahora se puede deslizar para verlo
+entero.
+
 **2026-07-23 — Prompt: evitar objetos inventados y marcas raras.**
 Sega detectó en pruebas reales que a veces la simulación añadía cosas
 que no estaban en la foto original (rayas en la cabeza, unos AirPods).
