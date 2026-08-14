@@ -1,0 +1,6 @@
+# hairvision/server es su propio repositorio Git (hairvision-server en
+# GitHub), no debe vivir dentro de este repo de la app. Si se llega a
+# incluir por accidente (como pasó), GitHub Pages no puede construir la
+# página (falla el "Checkout" del despliegue porque git lo trata como
+# un submódulo sin URL configurada).
+hairvision/server/

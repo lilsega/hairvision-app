@@ -1,5 +1,29 @@
 # Registro de decisiones
 
+**2026-08-14 — Causa real encontrada: GitHub Pages llevaba semanas sin
+desplegar nada.** Después de que ni el arreglo de scroll ni nada más
+apareciera en la web pese a subirlo varias veces (ni en incógnito, ni
+en el móvil, ni en la tablet), se investigó directamente en GitHub
+Actions: **todos los despliegues de "pages build and deployment" desde
+el 12 de agosto estaban fallando**, con el error `No url found for
+submodule path 'hairvision/server' in .gitmodules`. Causa:
+`hairvision/server` es su propio repositorio Git (el repo
+`hairvision-server`, donde vive el servidor real), pero en algún
+momento quedó registrado por accidente DENTRO del repo de la app
+(`hairvision-app`) como un "repositorio incrustado" — git lo trataba
+como si fuera un submódulo sin URL configurada, y esto hacía fallar el
+checkout de cada despliegue de Pages desde entonces. Resultado: la
+página pública llevaba congelada en la versión del 28 de julio — nada
+de lo subido después (aviso de privacidad, código de acceso, arreglo
+del prompt de IA, arreglos de scroll) había llegado nunca a estar en
+línea de verdad. Arreglado quitando `hairvision/server` del control de
+versiones del repo de la app (`git rm -r --cached`) y añadiéndolo a un
+nuevo `.gitignore` en la raíz del repo de la app, para que nunca vuelva
+a incluirse por accidente. Lección: cuando algo publicado no refleja
+cambios recién subidos pese a descartar caché, hay que revisar el
+estado real del despliegue (pestaña Actions de GitHub) antes de seguir
+buscando el problema en el código de la app.
+
 **2026-07-23 — Segundo intento del arreglo de scroll.** El primer
 arreglo (activar `overflow-y:auto` en `.hv-screen`) no resolvió el
 problema para Sega probando en la tablet real, incluso en incógnito
